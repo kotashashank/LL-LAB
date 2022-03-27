@@ -32,7 +32,7 @@ typedef struct port {
 } *port_t;
 
 // The next three routines allow a test routine to specify the circuit structure.
-extern port_t port(const ptype_t pt, ...);
+extern port_t port(const ptype_t pt, int num_args, ...);
 extern void gate(const op_t op, const port_t out, ...);
 extern void wire(const port_t src, const port_t dst);
 
