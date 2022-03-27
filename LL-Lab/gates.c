@@ -21,7 +21,23 @@ extern port_t port(const ptype_t pt, ...)
 }
 extern void gate(const op_t op, const port_t out, ...)
 {
+    va_list va;
+    int num_args;
 
+    switch (op) {
+        case OP_NOT: num_args = 1; 
+            break;
+        case  OP_AND: OP_OR: OP_XOR: OP_NAND: OP_NOR: num_args = 2;
+           break;
+                    default:
+                assert(0);
+        }
+    
+    va_start(va, num_args);
+    for (int i = 0; i < num_args; i++) {
+        port_t portType = va_arg(va, port_t);
+    }
+    va_end(va);
 }
 extern void wire(const port_t src, const port_t dst)
 {
