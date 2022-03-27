@@ -38,11 +38,11 @@ extern void clock(const unsigned hi, const unsigned lo)
 
 extern void set_port(port_t p, bool val, unsigned t)
 {
-
+    p->val = val;
 }
 extern bool get_port(port_t p)
 {
-
+    return p->val;
 }
 extern unsigned get_sim_time(void);
 
