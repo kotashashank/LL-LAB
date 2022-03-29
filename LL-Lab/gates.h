@@ -3,6 +3,13 @@
 
 #include <stdarg.h>
 
+
+// troolean false/true/undefined
+
+#define UNDEFINED 2
+#define TRUE 1
+#define FALSE 0
+
 // The delay of a gate.
 extern unsigned delay;
 

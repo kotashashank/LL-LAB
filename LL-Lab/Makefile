@@ -7,8 +7,8 @@ all: runner
 gates.o: gates.c gates.h
 fulladder.o: fulladder.c
 
-hashmap: hashmap.c
-	$(CC) $(CFLAGS) -o hashmap hashmap.c
+ht: ht.c ht.h
+	$(CC) $(CFLAGS) -o ht ht.c ht.h
 
 runner: fulladder.o gates.o
 	$(CC) $(CFLAGS) -o ll gates.o fulladder.o

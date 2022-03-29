@@ -197,3 +197,8 @@ bool ht_next(hti* it) {
     }
     return false;
 }
+
+int main() {
+
+    printf("working");
+}

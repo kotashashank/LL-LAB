@@ -1,6 +1,7 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <assert.h>
 #include "gates.h"
 
 // The delay of a gate.
@@ -13,9 +14,9 @@ port_t port(const ptype_t pt, const char *name)
     port_t new_port = malloc(sizeof(port_t));
     new_port->pt = pt;
     new_port->name = name;
+    new_port->misc = UNDEFINED; // every port starts undefined
 
-    printf("port added of type %d and of name  %s\n", new_port->pt, new_port->name);
-
+    printf("port added of type %i and of name %s\n", new_port->pt);
 
 
     // TODO: ADD TO HASHMAP
@@ -66,11 +67,15 @@ void clock(const unsigned hi, const unsigned lo)
 
 void set_port(port_t p, bool val)
 {
-    //p->val = val;
+
+    p->misc = (short*) val;
+
+
 }
 bool get_port(port_t p)
 {
-    //return p->val;
+    if(p->misc == UNDEFINED) assert(false);
+    return p->misc;
 }
 unsigned get_sim_time(void) {
     return -1;

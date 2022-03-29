@@ -15,7 +15,7 @@ void fulladder(port_t ain, port_t bin, port_t cin, port_t sum, port_t cout) {
     port_t HA1s = port(PTYPE_OUT, "_HA1s");
     port_t HA1d = port(PTYPE_OUT, "_HA1d");
     port_t HA2a = port(PTYPE_IN, "_HA2a");
-    port_t HA2b = port(PTYPE_IN, "_HA2b");
+    port_t HA2b = port(PTYPE_IN, "_HA2b"); 
     port_t HA2c = port(PTYPE_IN, "_HA2c");
     port_t HA2s = port(PTYPE_OUT, "_HA2s");
     port_t HA2d = port(PTYPE_OUT, "_HA2d");
@@ -26,6 +26,8 @@ void fulladder(port_t ain, port_t bin, port_t cin, port_t sum, port_t cout) {
     gate(OP_XOR, HA1s, 2, HA1a, HA1b); gate(OP_AND, HA1d, 2, HA1a, HA1b);
     gate(OP_XOR, HA2s, 2, HA2a, HA2b); gate(OP_AND, HA2d, 2, HA2a, HA2b);
     gate(OP_OR, Cout, 2, Cout1, Cout2);
+
+    
     wire(ain, HA1a); wire(bin, HA1b);
     wire(HA1s, HA2a); wire(cin, HA2b);
     wire(HA1d, Cout1); wire(HA2d, Cout2);
