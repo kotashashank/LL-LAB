@@ -2,6 +2,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include "gates.h"
 
 // The delay of a gate.
@@ -16,7 +18,7 @@ port_t port(const ptype_t pt, const char *name)
     new_port->name = name;
     new_port->misc = UNDEFINED; // every port starts undefined
 
-    printf("port added of type %i and of name %s\n", new_port->pt);
+    printf("port added of type %i and of name %s\n", new_port->pt, new_port->name);
 
 
     // TODO: ADD TO HASHMAP

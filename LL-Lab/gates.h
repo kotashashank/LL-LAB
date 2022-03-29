@@ -22,6 +22,13 @@ typedef enum ptype {
     PTYPE_ERR = -1
 } ptype_t;
 
+typedef struct port_data {
+    bool value;
+    bool isValid;
+    gate_t nextGate;//null if no gate
+    port_t ports[]; 
+} *pdata_t;
+
 // The port object.
 typedef struct port {
     char *name; // Name of port (optional)
@@ -43,8 +50,8 @@ typedef enum op {
 // The gate object.
 typedef struct gate {
     op_t op;
-    port_t* port_inputs;
-    port_t* port_outputs;
+    port_t port_inputs[];
+    port_t port_outputs[];
     int delay;
 } *gate_t;
 
