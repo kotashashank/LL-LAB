@@ -1,4 +1,4 @@
-// Priority Queue implementation in C
+//  Priority Queue implementation in C
 
 #include <stdio.h>
 int size = 0;
