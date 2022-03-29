@@ -22,12 +22,6 @@ typedef enum ptype {
     PTYPE_ERR = -1
 } ptype_t;
 
-typedef struct port_data {
-    bool value;
-    bool isValid;
-    gate_t nextGate;//null if no gate
-    port_t ports[]; 
-} *pdata_t;
 
 // The port object.
 typedef struct port {
@@ -50,10 +44,18 @@ typedef enum op {
 // The gate object.
 typedef struct gate {
     op_t op;
-    port_t port_inputs[];
-    port_t port_outputs[];
+    port_t port_inputs[3];
+    port_t port_outputs[3];
     int delay;
 } *gate_t;
+
+typedef struct port_data {
+    bool value;
+    bool isValid;
+    gate_t nextGate;//null if no gate
+    port_t ports[]; 
+} *pdata_t;
+
 
 // The next three routines allow a test routine to specify the circuit structure.
 extern port_t port(const ptype_t pt, const char *name);
