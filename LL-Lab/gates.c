@@ -11,7 +11,7 @@ unsigned delay;
 
 // Initilizes a new port
 port_t port(const ptype_t pt, const char *name)
-{
+{//in the future, we might need to add EXT_IN to global for memory management
   
     port_t new_port = malloc(sizeof(port_t));
     new_port->pt = pt;
@@ -21,7 +21,7 @@ port_t port(const ptype_t pt, const char *name)
     misc_info->nextGate = 0;
     misc_info->ports = malloc(sizeof(port_t) * 3);//value doesn't matter b/c currently invalid
     void * misc = (void *) (misc_info);
-    new_port->misc = UNDEFINED; // every port starts undefined
+    new_port->misc = misc; // every port starts undefined
 
     printf("port added of type %i and of name %s\n", new_port->pt, new_port->name);
 
