@@ -1,15 +1,29 @@
+
 //  Priority Queue implementation in C
 
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include "gates.h"
+#include "priorityqueue.h"
+
+
 int size = 0;
-void swap(int *a, int *b) {
-  int temp = *b;
+unsigned t;
+node_t heap_array[];
+
+
+void swap(node_t *a, node_t *b) {
+  node_t temp = *b;
   *b = *a;
   *a = temp;
 }
 
 // Function to heapify the tree
-void heapify(int array[], int size, int i) {
+void heapify(node_t array[], int size, int i) {
   if (size == 1) {
     printf("Single element in the heap");
   } else {
@@ -17,9 +31,9 @@ void heapify(int array[], int size, int i) {
     int largest = i;
     int l = 2 * i + 1;
     int r = 2 * i + 2;
-    if (l < size && array[l] > array[largest])
+    if (l < size && array[l]->t < array[largest]->t )
       largest = l;
-    if (r < size && array[r] > array[largest])
+    if (r < size && array[r]->t < array[largest]->t)
       largest = r;
 
     // Swap and continue heapifying if root is not largest
@@ -31,12 +45,17 @@ void heapify(int array[], int size, int i) {
 }
 
 // Function to insert an element into the tree
-void insert(int array[], int newNum) {
+void insert(node_t array[], port_t new_port) {
+
+  node_t new_node = malloc(sizeof(node_t));
+  new_node->port = new_port;
+  new_node->t = t;
+
   if (size == 0) {
-    array[0] = newNum;
+    array[0] = new_node;
     size += 1;
   } else {
-    array[size] = newNum;
+    array[size] = new_node;
     size += 1;
     for (int i = size / 2 - 1; i >= 0; i--) {
       heapify(array, size, i);
@@ -45,10 +64,10 @@ void insert(int array[], int newNum) {
 }
 
 // Function to delete an element from the tree
-void deleteRoot(int array[], int num) {
+void deleteRoot(node_t array[]) {
   int i;
   for (i = 0; i < size; i++) {
-    if (num == array[i])
+    if (&array[0] == &array[i])
       break;
   }
 
@@ -60,28 +79,35 @@ void deleteRoot(int array[], int num) {
 }
 
 // Print the array
-void printArray(int array[], int size) {
+void printArray(node_t array[], int size) {
   for (int i = 0; i < size; ++i)
-    printf("%d ", array[i]);
+    printf("[name: %s time: %d]", array[i]->port->name, array[i]->t);
   printf("\n");
 }
 
-// Driver code
+// testing code
 int main() {
-  int array[10];
+  
+  
 
-  insert(array, 3);
-  insert(array, 4);
-  insert(array, 9);
-  insert(array, 5);
-  insert(array, 2);
+  port_t HA1a = port(PTYPE_IN, "t0");
+
+  port_t HA1b = port(PTYPE_IN, "t2");
+
+  port_t HA1c = port(PTYPE_IN, "t4");
+
+  insert(heap_array, HA1a);
+  t = 2;
+  insert(heap_array, HA1b);
+  t = 4;
+  insert(heap_array, HA1c);
 
   printf("Max-Heap array: ");
-  printArray(array, size);
+  printArray(heap_array, size);
 
-  deleteRoot(array, 4);
-
+  deleteRoot(heap_array);
   printf("After deleting an element: ");
 
-  printArray(array, size);
+  printArray(heap_array, size);
+
 }
