@@ -1,66 +1,84 @@
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include "gates.h"
 
 // The delay of a gate.
-extern unsigned delay;
+unsigned delay;
 
-// The next three routines allow a test routine to specify the circuit structure.
-extern port_t port(const ptype_t pt, ...)
+// Initilizes a new port
+port_t port(const ptype_t pt, const char *name)
 {
-    va_list valist;
-    va_start(valist, num);
-    for(int i = 0; i < num; i++)
-    {
-        va_arg(valist, num);
-    }
-    va_end(valist);
-    port_t * new;
+  
+    port_t new_port = malloc(sizeof(port_t));
+    new_port->pt = pt;
+    new_port->name = name;
 
-    return new;
+    printf("port added of type %d and of name  %s\n", new_port->pt, new_port->name);
+
+
+
+    // TODO: ADD TO HASHMAP
+
+    return new_port;
+
 }
-extern void gate(const op_t op, const port_t out, ...)
-{
-    va_list va;
-    int num_args;
 
-    switch (op) {
-        case OP_NOT: num_args = 1; 
-            break;
-        case  OP_AND: OP_OR: OP_XOR: OP_NAND: OP_NOR: num_args = 2;
-           break;
-                    default:
-                assert(0);
-        }
+void gate(const op_t op, const port_t out, const unsigned num_in, ...)
+{
+
     
-    va_start(va, num_args);
-    for (int i = 0; i < num_args; i++) {
-        port_t portType = va_arg(va, port_t);
+    // create one-dimensional input_port array
+    va_list va;
+    va_start(va, num_in);
+
+    port_t port_inputs[num_in];
+    port_t *port_input_start = port_inputs;
+
+    for (int i = 0; i < num_in; i++) {
+        port_inputs[i] = va_arg(va, port_t);
+        printf("adding port %d: port %s to this gate\n", i, port_inputs[i]->name);
     }
-    va_end(va);
+
+    gate_t new_gate = malloc(sizeof(gate_t) + sizeof(port_inputs) * 2); // idk i hate c
+
+    // set gate struct
+    new_gate->op = op;
+    new_gate->port_inputs = port_input_start;
+    new_gate->port_outputs = out;
+    new_gate->delay = 2; // FIX
+    
+
+    // ADD TO HASHMAP
 }
-extern void wire(const port_t src, const port_t dst)
+void wire(const port_t src, const port_t dst)
 {
-    dst->val = src->val;
-    dst->pt = src->pt;
+    // dst->val = src->val;
+    // dst->pt = src->pt;
 }
 
 // The remaining routines allow a test routine to simulate a given circuit for a number of timesteps.
 // A timestep is of an arbitrary and unspecified number of seconds.
-extern void clock(const unsigned hi, const unsigned lo)
+void clock(const unsigned hi, const unsigned lo)
 {
 
 }
 
-extern void set_port(port_t p, bool val, unsigned t)
+void set_port(port_t p, bool val)
 {
-    p->val = val;
+    //p->val = val;
 }
-extern bool get_port(port_t p)
+bool get_port(port_t p)
 {
-    return p->val;
+    //return p->val;
 }
-extern unsigned get_sim_time(void);
+unsigned get_sim_time(void) {
+    return -1;
+}
 
-extern void sim_init(void);
-extern void sim_run(const unsigned nsteps);
+void sim_init(void) {
+    return;
+}
+void sim_run(const unsigned nsteps) {
+    return;
+}
