@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <priorityqueue.h>
 #include "gates.h"
 
 // The delay of a gate.
@@ -81,10 +82,21 @@ void gate(const op_t op, const port_t out, const unsigned num_in, ...)
 
     // ADD TO HASHMAP
 }
+
+//init wire
 void wire(const port_t src, const port_t dst)
 {
     // dst->val = src->val;
     // dst->pt = src->pt;
+
+    //add to front of linkedlist
+    linked_list next = ((pdata_t) src->misc)->ports;
+    linked_list newData = malloc(sizeof(node));
+    newData->data = (void *)(dst);
+    newData->next = next;
+    ((pdata_t) src->misc)->ports = newData;
+    
+
 }
 
 // The remaining routines allow a test routine to simulate a given circuit for a number of timesteps.
@@ -98,7 +110,6 @@ void set_port(port_t p, bool val)
 {
 
     p->misc = (short*) val;
-
 
 }
 bool get_port(port_t p)
