@@ -43,20 +43,6 @@ port_t port(const ptype_t pt, const char *name)
 
 }
 
-/* irrelevant unless Chat changes the code again (so like 90% chance its useful)
-void updateVals(linked_list listOfPorts, linked_list listOfValues) {
-    while (listOfValues) {
-         //void -> port_t * -> pdata_t -> value, isValid
-         ((pdata_t)(((port_t)(listOfPorts->data))->misc))->value = *((bool *)(listOfValues->data));
-         ((pdata_t)(((port_t)(listOfPorts->data))->misc))->isValid = 1;
-
-         listOfValues = listOfValues->next;
-         listOfPorts = listOfPorts->next;
-         
-         assert(0);//still need to push these new ports to the priority queue
-
-    }
-}*/
 
 void gate(const op_t op, const port_t out, const unsigned num_in, ...)
 {
@@ -65,12 +51,14 @@ void gate(const op_t op, const port_t out, const unsigned num_in, ...)
     va_list va;
     va_start(va, num_in);
 
+    //first input to gate (linked list of ports)
     linked_list port_ins = malloc(sizeof(node));
     port_t data = va_arg(va, port_t);
     port_ins->data = (void *)(data);
     port_ins->next = 0;
 
     linked_list prevNode = port_ins;
+    //add ports to ll
     for (int i = 1; i < num_in; i++) {
         port_t portPointer = va_arg(va, port_t);
         linked_list nextNode = malloc(sizeof(node));
@@ -87,21 +75,23 @@ void gate(const op_t op, const port_t out, const unsigned num_in, ...)
     gate_t new_gate = malloc(sizeof(struct gate));
 
     // set gate struct values
+    //update gate
     new_gate->op = op;
     new_gate->port_inputs = port_ins;
     new_gate->port_output = out;
     new_gate->delay = delay;
 
+    //connect input points to gate so can process when building graph
     for (int i = 0; i < num_in; i++) {
         linked_list new_node = malloc(sizeof(node));
         new_node->data = new_gate;
         
-        if (  ((pdata_t)(port_ins->data))->gates ==0) {
+        if (  ((pdata_t)(port_ins->data))->gates ==0) {//create if needed
             new_node->next = 0;
             ((pdata_t)(port_ins->data))->gates = new_node;
         }
         else {
-            new_node->next = ((pdata_t)(port_ins->data))->gates;
+            new_node->next = ((pdata_t)(port_ins->data))->gates;//append if needed
             ((pdata_t)(port_ins->data))->gates = new_node;
         }
         
@@ -109,7 +99,7 @@ void gate(const op_t op, const port_t out, const unsigned num_in, ...)
     
 }
 
-logic_return AND(linked_list inputs) {
+logic_return AND(linked_list inputs) {//if valid 0, return false; otherwise indeterminant or true if all valid and ture
     bool allInputValid = 1;
     while (inputs) {
         if( ((pdata_t)(inputs->data))->value == 0) {
@@ -132,7 +122,7 @@ logic_return AND(linked_list inputs) {
     //return 1;
 }
 
-logic_return OR(linked_list inputs) {
+logic_return OR(linked_list inputs) {//if there is a valid 1, its true; else it is either invalid or if all false then false
     bool allInputValid = 1;
     while (inputs) {
         if( ((pdata_t)(inputs->data))->value == 1) {//we only need 1 valid 1 for it to be truly valid
@@ -173,7 +163,7 @@ logic_return XOR(linked_list inputs) {//are there an odd number of ones
     return log;
 }
 
-void delayed_process_gate(gate_t g) { // add to list to process
+void delayed_process_gate(gate_t g) { // add to list to process after current time stamp
 
     if (!gates_delayed_processing) {
         linked_list startNode = malloc(sizeof(node));
@@ -197,14 +187,17 @@ void delayed_process_gate(gate_t g) { // add to list to process
     //append this gate pointer to gates_delayed_processing
 }
 
-void process_delayed_gates() {
+void process_delayed_gates() {//process all gates we left for later
     linked_list current_place = gates_delayed_processing;
     while (current_place) {
         gate_t g = (gate_t)current_place->data;
         process_gate(g);
-
+        linked_list old_place = current_place;
         current_place = current_place->next;
+        free(old_place);//freeing node b./c were done w/ it now
+
     }
+    gates_delayed_processing = 0;
 }
 //process gate
 void process_gate(gate_t g) {
@@ -266,13 +259,14 @@ void wire(const port_t src, const port_t dst)
     // dst->pt = src->pt;
 
     //add to front of linkedlist
-    if (((pdata_t)(src->misc))->ports ==0) {
+    if (((pdata_t)(src->misc))->ports ==0) {//if no ports, create linked list
         linked_list portList = malloc(sizeof(node));
         portList->next = 0; 
         portList->data = (void *)(dst);
         ((pdata_t)(src->misc))->ports = portList;
         return;
     }
+    //if linked list of ports, add this to front
     linked_list next = ((pdata_t) src->misc)->ports;
     linked_list newData = malloc(sizeof(node));
     newData->data = (void *)(dst);
@@ -291,9 +285,11 @@ void clock(const unsigned hi, const unsigned lo)
 
 void set_port(port_t p, bool val)
 {
+    //if this is already true, quit
     if (((pdata_t) p->misc)->value == val && ((pdata_t) p->misc)->isValid ==1)//all is already fine
         return;
 
+    //its being set so now valid
     ((pdata_t) p->misc)->value = val;
     ((pdata_t) p->misc)->isValid = 1;
 
@@ -314,7 +310,7 @@ void set_port(port_t p, bool val)
     while (theGates) {//there is a gate we need to process
         //TIME COMPLEXITY REDUCTION: wait til done with all setting values before doing this
         gate_t theGate = (gate_t)theGates->data;
-        delayed_process_gate(theGate);
+        delayed_process_gate(theGate);//push to process after done w/ all of current time stamp
 
         theGates = theGates->next;
     }
@@ -338,8 +334,8 @@ void sim_init(void) {
 void sim_run(const unsigned nsteps) {
    t = t + nsteps;
    unsigned int lastTime = heap_array[0]->t;
-   while (heap_array[0]->t < t) {
-       if (heap_array[0]->t != lastTime) {
+   while (heap_array[0]->t < t) {//while stuff to pop, pop it
+       if (heap_array[0]->t != lastTime) {//process delayed gates if there's a time difference
            process_delayed_gates();
            //process all delayed gates
        }
@@ -354,12 +350,9 @@ void sim_run(const unsigned nsteps) {
        }}
     
    }
-   process_delayed_gates();
-   //go ahead and process all delayed gates
-
-
-
-   //deleteRoot deletes the first one 
-   //
-   //while priority queue has stuff that needs to change of time less than t
+   if (gates_delayed_processing!=0) {//if gates left to process process then run again
+       process_delayed_gates();
+       sim_run(0);
+   }
+   
 }
