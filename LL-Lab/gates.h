@@ -10,7 +10,6 @@
 
 // troolean false/true/undefined
 
-#define UNDEFINED 2
 #define TRUE 1
 #define FALSE 0
 
@@ -81,7 +80,7 @@ extern port_t port(const ptype_t pt, const char *name);
 extern void gate(const op_t op, const port_t out, const unsigned num_in, ...);
 extern void wire(const port_t src, const port_t dst);
 
-void process_gate( gate_t g);
+void process_gate(gate_t g);
 
 // The remaining routines allow a test routine to simulate a given circuit for a number of timesteps.
 // A timestep is of an arbitrary and unspecified number of seconds.

@@ -243,15 +243,15 @@ void set_port(port_t p, bool val)
 }
 bool get_port(port_t p)
 {
-    if(p->misc == UNDEFINED) assert(false);
-    return p->misc;
+    //if(p->misc == UNDEFINED) assert(false);
+    return ((pdata_t)p->misc)->value;
 }
 unsigned get_sim_time(void) {
-    return -1;
+    return t;
 }
 
 void sim_init(void) {
-    return;
+    t=0;
 }
 void sim_run(const unsigned nsteps) {
     return;
