@@ -96,14 +96,38 @@ void gate(const op_t op, const port_t out, const unsigned num_in, ...)
     
 }
 
+logic_return AND(linked_list inputs) {
+    bool allInputValid = 1;
+    while (inputs) {
+        if( ((pdata_t)(inputs->data))->value == 0) {
+            if (((pdata_t)(inputs->data))->isValid ) {
+                logic_return definitely_false;
+                definitely_false.value = 0;
+                definitely_false.isValid = 1;
+                return definitely_false;
+            }
+        }
+        if (!((pdata_t)(inputs->data))->isValid) {//if its not valid
+            allInputValid = 0;
+        }
+        
+    }
+
+    logic_return ret;
+    ret.value = 1;
+    ret.value = allInputValid;
+    return ret;
+    //return 1;
+}
+
 //process gate
 void process_gate(gate_t g) {
-
+    //first make sure all values are valid
     op_t op = g->op;
-    bool out;
+    logic_return out;
     switch (op) {
         case OP_AND:
-            out =  AND(g->port_inputs);
+            out = AND(g->port_inputs);
             break;
         case OP_ERROR:
             printf("ERROR HERE gates.c\n");
@@ -130,7 +154,10 @@ void process_gate(gate_t g) {
             assert(0);
             break;
     }
-    if (out == ((pdata_t)g->port_output->misc)->value) {//and statement on two lines
+    if (!out.isValid) {
+        return;//no use processing further, output is invalid
+    }
+    if (out.value == ((pdata_t)g->port_output->misc)->value) {//and statement on two lines
         bool isValid = ((pdata_t)(g->port_output->misc))->isValid;
         if (isValid)
          return;//value is always valid and not changing

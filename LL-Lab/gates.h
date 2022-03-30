@@ -72,6 +72,10 @@ typedef struct port_data {
     //port_t ports[]; 
 } *pdata_t;
 
+typedef struct return_from_logic {
+    bool isValid;
+    bool value;
+} logic_return;
 
 // The next three routines allow a test routine to specify the circuit structure.
 extern port_t port(const ptype_t pt, const char *name);
