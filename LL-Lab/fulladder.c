@@ -44,21 +44,24 @@ int main(void) {
     port_t D = port(PTYPE_EXT_OUT, NULL);
     delay = 2;
     fulladder(A, B, C, S, D);
-    // unsigned t = get_sim_time();
-    // for (int i = 0; i < 2; i++) {
-    //     for (int j = 0; j < 2; j++) {
-    //         for (int k = 0; k < 2; k++) {
-    //             set_port(A, i%2 == 0);
-    //             set_port(B, j%2 == 0);
-    //             set_port(C, k%2 == 0);
-    //             for (int n = 0; n < 10; n++) {
-    //                 printf("[%du] %d %d %d %d %d\n", 
-    //                     t, get_port(A), get_port(B), get_port(C), get_port(S), get_port(D));
-    //                 sim_run(1); t++;
-    //                 assert(get_sim_time() == t);
-    //             }
-    //         }
-    //     }
-    // }
+     unsigned t = get_sim_time();
+     for (int i = 0; i < 2; i++) {
+         for (int j = 0; j < 2; j++) {
+             for (int k = 0; k < 2; k++) {
+                 set_port(A, i%2 == 0);
+                 set_port(B, j%2 == 0);
+                 set_port(C, k%2 == 0);
+                 for (int n = 0; n < 10; n++) {
+                     printf("[%du] %d %d %d %d %d\n", 
+                         t, get_port(A), get_port(B), get_port(C), get_port(S), get_port(D));
+                    
+                     sim_run(1); 
+                   
+                     t++;
+                     assert(get_sim_time() == t);
+                 }
+             }
+         }
+     }
     return EXIT_SUCCESS;
 }
