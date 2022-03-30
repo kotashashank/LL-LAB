@@ -207,7 +207,7 @@ void process_gate(gate_t g) {
     //value is changing either val or isValid
     node_t node = malloc(sizeof(struct pq_node));
     node->port = g->port_output;
-    node->new_value = out;
+    node->new_value = out.value;
     node->t = t + g->delay;
     insert(heap_array, node);
     //heap_array.insert()
