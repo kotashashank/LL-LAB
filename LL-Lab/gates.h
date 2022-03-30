@@ -3,7 +3,7 @@
 
 #include <stdarg.h>
 #include <stdbool.h>
-#include <priorityqueue.h>
+#include "priorityqueue.h"
 
 //TODOS
 //need global variable keeping track of all malloc that we can unmalloc at the end
