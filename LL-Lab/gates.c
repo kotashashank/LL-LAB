@@ -22,10 +22,10 @@ void freeLL(linked_list ll) {
 port_t port(const ptype_t pt, const char *name)
 {//in the future, we might need to add EXT_IN to global for memory management
   
-    port_t new_port = malloc(sizeof(port_t));
+    port_t new_port = malloc(sizeof(struct port));
     new_port->pt = pt;
     new_port->name = name;
-    pdata_t misc_info = malloc(sizeof(pdata_t));
+    pdata_t misc_info = malloc(sizeof(struct port_data));
     misc_info->isValid = 0;
     misc_info->nextGate = 0;
     misc_info->ports = malloc(sizeof(port_t) * 3);//value doesn't matter b/c currently invalid
@@ -80,7 +80,9 @@ void gate(const op_t op, const port_t out, const unsigned num_in, ...)
         printf("adding port %d: port %s to this gate\n", i, portPointer->name);
     }
 
-    gate_t new_gate = malloc(sizeof(gate_t));
+    va_end(va);
+
+    gate_t new_gate = malloc(sizeof(struct gate));
 
     // set gate struct values
     new_gate->op = op;
@@ -91,6 +93,7 @@ void gate(const op_t op, const port_t out, const unsigned num_in, ...)
     for (int i = 0; i < num_in; i++) {
         ((pdata_t)(port_ins->data))->nextGate = new_gate;
     }
+    
 }
 
 //process gate
