@@ -97,7 +97,51 @@ void gate(const op_t op, const port_t out, const unsigned num_in, ...)
 }
 
 //process gate
-void process_gate(struct gate g);
+void process_gate(gate_t g) {
+
+    op_t op = g->op;
+    bool out;
+
+    switch (op) {
+        case OP_AND:
+            out =  AND(g->port_inputs);
+            break;
+        case OP_ERROR:
+            printf("ERROR HERE gates.c\n");
+            assert(0);
+            break; 
+        case OP_NAND:
+            out = AND(g->port_inputs);
+            out = !out;
+            break;
+        case OP_NOT:
+            out = !(((pdata_t)(g->port_inputs->data))->value);//this operation assumes it is valid b/c only 1 input 
+            break;
+        case OP_OR:
+            out = OR(g->port_inputs);
+            break;
+        case OP_NOR:
+            out = !OR(g->port_inputs);
+            break;
+        case OP_XOR:
+            out = XOR(g->port_inputs); 
+            break;
+        default:
+            printf("FUCK, op is off \n");
+            assert(0);
+            break;
+    }
+    /*
+
+typedef struct gate {
+    op_t op;
+    linked_list port_inputs;
+    port_t port_output;
+    int delay;
+} *gate_t;
+
+    */
+};
 
 //init wire
 void wire(const port_t src, const port_t dst)

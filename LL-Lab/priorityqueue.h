@@ -8,7 +8,7 @@
 
 extern int size;
 
-typedef struct node {
+typedef struct pq_node {
   port_t port;
   unsigned int t;
   bool new_value;
