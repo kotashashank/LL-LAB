@@ -9,6 +9,14 @@
 // The delay of a gate.
 unsigned delay;
 
+void freeLL(linked_list ll) {
+    while (ll) {
+        linked_list next = ll->next;
+        free(ll->data);
+        free(ll);
+        ll = next;
+    }
+}
 // Initilizes a new port
 port_t port(const ptype_t pt, const char *name)
 {//in the future, we might need to add EXT_IN to global for memory management
@@ -30,6 +38,20 @@ port_t port(const ptype_t pt, const char *name)
 
     return new_port;
 
+}
+
+void updateVals(linked_list listOfPorts, linked_list listOfValues) {
+    while (listOfValues) {
+         //void -> port_t * -> pdata_t -> value, isValid
+         ((pdata_t)(((port_t)(listOfPorts->data))->misc))->value = *((bool *)(listOfValues->data));
+         ((pdata_t)(((port_t)(listOfPorts->data))->misc))->isValid = 1;
+
+         listOfValues = listOfValues->next;
+         listOfPorts = listOfPorts->next;
+         
+         assert(0);//still need to push these new ports to the priority queue
+
+    }
 }
 
 void gate(const op_t op, const port_t out, const unsigned num_in, ...)

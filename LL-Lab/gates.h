@@ -3,6 +3,9 @@
 
 #include <stdarg.h>
 
+//TODOS
+//need global variable keeping track of all malloc that we can unmalloc at the end
+
 
 // troolean false/true/undefined
 
@@ -13,6 +16,8 @@
 // The delay of a gate.
 extern unsigned delay;
 
+
+
 // The different kinds of ports.
 typedef enum ptype {
     PTYPE_IN,
@@ -22,6 +27,16 @@ typedef enum ptype {
     PTYPE_ERR = -1
 } ptype_t;
 
+
+typedef struct linked_list_node {
+    void * data;
+    linked_list next;
+} node, *linked_list;
+
+//after gate calculations, update the ports associated with a gate with the correct values
+extern void updateVals(linked_list listOfPorts, linked_list listOfValues);
+
+extern void freeLL(linked_list node );
 
 // The port object.
 typedef struct port {
@@ -44,8 +59,10 @@ typedef enum op {
 // The gate object.
 typedef struct gate {
     op_t op;
-    port_t port_inputs[3];
-    port_t port_outputs[3];
+    linked_list port_inputs;
+    linked_list port_outputs;
+    //port_t port_inputs[3];
+    //port_t port_outputs[3];
     int delay;
 } *gate_t;
 
@@ -53,7 +70,8 @@ typedef struct port_data {
     bool value;
     bool isValid;
     gate_t nextGate;//null if no gate
-    port_t ports[]; 
+    linked_list ports;
+    //port_t ports[]; 
 } *pdata_t;
 
 
