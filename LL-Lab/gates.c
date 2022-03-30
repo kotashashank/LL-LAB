@@ -9,6 +9,7 @@
 
 // The delay of a gate.
 unsigned delay;
+linked_list gates_delayed_processing;
 
 void freeLL(linked_list ll) {
     while (ll) {
@@ -27,8 +28,9 @@ port_t port(const ptype_t pt, const char *name)
     new_port->name = name;
     pdata_t misc_info = malloc(sizeof(struct port_data));
     misc_info->isValid = 0;
-    misc_info->nextGate = 0;
-    misc_info->ports = malloc(sizeof(port_t) * 3);//value doesn't matter b/c currently invalid
+    misc_info->nextGates = 0;
+    misc_info->ports = 0;
+    //misc_info->ports = malloc(sizeof(port_t) * 3);//value doesn't matter b/c currently invalid
     void * misc = (void *) (misc_info);
     new_port->misc = misc; // every port starts undefined
 
@@ -91,7 +93,18 @@ void gate(const op_t op, const port_t out, const unsigned num_in, ...)
     new_gate->delay = delay;
 
     for (int i = 0; i < num_in; i++) {
-        ((pdata_t)(port_ins->data))->nextGate = new_gate;
+        linked_list new_node = malloc(sizeof(node));
+        new_node->data = new_gate;
+        
+        if (  ((pdata_t)(port_ins->data))->nextGates ==0) {
+            new_node->next = 0;
+            ((pdata_t)(port_ins->data))->nextGates = new_node;
+        }
+        else {
+            new_node->next = ((pdata_t)(port_ins->data))->nextGates;
+            ((pdata_t)(port_ins->data))->nextGates = new_node;
+        }
+        
     }
     
 }
@@ -159,6 +172,30 @@ logic_return XOR(linked_list inputs) {//are there an odd number of ones
     log.isValid = 1;
     return log;
 }
+
+void delayed_process_gate(gate_t g) {
+
+    if (!gates_delayed_processing) {
+        linked_list startNode = malloc(sizeof(node));
+        startNode->data = (void *)(g);
+        startNode->next = 0;
+        return;
+    }
+    linked_list current_place = gates_delayed_processing;
+    while (current_place) {//while its not null
+        if ((gate_t)current_place->data == g) {
+            return;
+        }
+
+    }//its not already in there
+
+    //we've reached end and ntohing there
+    linked_list newGate = malloc(sizeof(node));
+    newGate->data = (void *)(g);
+    newGate->next = gates_delayed_processing;
+    gates_delayed_processing = newGate;
+    //append this gate pointer to gates_delayed_processing
+}
 //process gate
 void process_gate(gate_t g) {
     //first make sure all values are valid
@@ -219,6 +256,13 @@ void wire(const port_t src, const port_t dst)
     // dst->pt = src->pt;
 
     //add to front of linkedlist
+    if (((pdata_t)(src->misc))->ports ==0) {
+        linked_list portList = malloc(sizeof(node));
+        portList->next = 0; 
+        portList->data = (void *)(dst);
+        ((pdata_t)(src->misc))->ports = portList;
+        return;
+    }
     linked_list next = ((pdata_t) src->misc)->ports;
     linked_list newData = malloc(sizeof(node));
     newData->data = (void *)(dst);
@@ -237,9 +281,36 @@ void clock(const unsigned hi, const unsigned lo)
 
 void set_port(port_t p, bool val)
 {
+    if (((pdata_t) p->misc)->value == val && ((pdata_t) p->misc)->isValid ==1)//all is already fine
+        return;
+
     ((pdata_t) p->misc)->value = val;
-    insert(heap_array, port);
-    printArray(heap_array, size);
+    ((pdata_t) p->misc)->isValid = 1;
+
+    //need to push children/gates/ports that are needed
+    linked_list port_children = ((pdata_t)(p->misc))->ports;
+    while (port_children) {
+        port_t current_port = (port_t)(port_children->data);
+        //its directly connected so need to set this port too
+        set_port(current_port, val);
+
+        //port_t children_port
+        port_children = port_children->next;
+    }
+    
+    linked_list theGates = ((pdata_t)(p->misc))->nextGates;
+
+    //gate_t * theGate = &(((pdata_t)(p->misc))->nextGate);
+    while (theGates) {//there is a gate we need to process
+        //TIME COMPLEXITY REDUCTION: wait til done with all setting values before doing this
+        gate_t theGate = (gate_t)theGates->data;
+        delayed_process_gate(theGate);
+
+        theGates = theGates->next;
+    }
+
+    //insert(heap_array, port);
+    //printArray(heap_array, size);
 }
 bool get_port(port_t p)
 {
@@ -252,7 +323,9 @@ unsigned get_sim_time(void) {
 
 void sim_init(void) {
     t=0;
+    gates_delayed_processing = 0;
 }
 void sim_run(const unsigned nsteps) {
-    return;
+   t = t + nsteps;
+   //while priority queue has stuff that needs to change of time less than t
 }

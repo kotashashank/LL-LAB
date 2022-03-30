@@ -65,7 +65,8 @@ typedef struct gate {
 typedef struct port_data {
     bool value;
     bool isValid;
-    gate_t nextGate;//null if no gate
+    linked_list nextGates;
+    //gate_t nextGate;//null if no gate
     linked_list ports;
     //port_t ports[]; 
 } *pdata_t;
