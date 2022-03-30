@@ -28,7 +28,7 @@ port_t port(const ptype_t pt, const char *name)
     new_port->name = name;
     pdata_t misc_info = malloc(sizeof(struct port_data));
     misc_info->isValid = 0;
-    misc_info->nextGates = 0;
+    misc_info->gates = 0;
     misc_info->ports = 0;
     //misc_info->ports = malloc(sizeof(port_t) * 3);//value doesn't matter b/c currently invalid
     void * misc = (void *) (misc_info);
@@ -96,13 +96,13 @@ void gate(const op_t op, const port_t out, const unsigned num_in, ...)
         linked_list new_node = malloc(sizeof(node));
         new_node->data = new_gate;
         
-        if (  ((pdata_t)(port_ins->data))->nextGates ==0) {
+        if (  ((pdata_t)(port_ins->data))->gates ==0) {
             new_node->next = 0;
-            ((pdata_t)(port_ins->data))->nextGates = new_node;
+            ((pdata_t)(port_ins->data))->gates = new_node;
         }
         else {
-            new_node->next = ((pdata_t)(port_ins->data))->nextGates;
-            ((pdata_t)(port_ins->data))->nextGates = new_node;
+            new_node->next = ((pdata_t)(port_ins->data))->gates;
+            ((pdata_t)(port_ins->data))->gates = new_node;
         }
         
     }
@@ -298,7 +298,7 @@ void set_port(port_t p, bool val)
         port_children = port_children->next;
     }
     
-    linked_list theGates = ((pdata_t)(p->misc))->nextGates;
+    linked_list theGates = ((pdata_t)(p->misc))->gates;
 
     //gate_t * theGate = &(((pdata_t)(p->misc))->nextGate);
     while (theGates) {//there is a gate we need to process
@@ -327,5 +327,7 @@ void sim_init(void) {
 }
 void sim_run(const unsigned nsteps) {
    t = t + nsteps;
+   //deleteRoot deletes the first one 
+   //
    //while priority queue has stuff that needs to change of time less than t
 }
