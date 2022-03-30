@@ -3,6 +3,7 @@
 
 #include <stdarg.h>
 #include <stdbool.h>
+#include <priorityqueue.h>
 
 //TODOS
 //need global variable keeping track of all malloc that we can unmalloc at the end
@@ -80,6 +81,8 @@ typedef struct port_data {
 extern port_t port(const ptype_t pt, const char *name);
 extern void gate(const op_t op, const port_t out, const unsigned num_in, ...);
 extern void wire(const port_t src, const port_t dst);
+
+void process_gate(struct gate g);
 
 // The remaining routines allow a test routine to simulate a given circuit for a number of timesteps.
 // A timestep is of an arbitrary and unspecified number of seconds.

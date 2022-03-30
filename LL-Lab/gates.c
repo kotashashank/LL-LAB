@@ -58,26 +58,25 @@ void updateVals(linked_list listOfPorts, linked_list listOfValues) {
 void gate(const op_t op, const port_t out, const unsigned num_in, ...)
 {
 
-    
     // create one-dimensional input_port array
     va_list va;
     va_start(va, num_in);
 
     port_t port_inputs[num_in];
-    port_t *port_input_start = port_inputs;
+    port_t port_input_start = port_inputs;
 
     for (int i = 0; i < num_in; i++) {
         port_inputs[i] = va_arg(va, port_t);
         printf("adding port %d: port %s to this gate\n", i, port_inputs[i]->name);
     }
 
-    gate_t new_gate = malloc(sizeof(gate_t) + sizeof(port_inputs) * 2); // idk i hate c
+    gate_t new_gate = malloc(sizeof(gate_t)); // idk i hate c
 
     // set gate struct
     new_gate->op = op;
     new_gate->port_inputs = port_input_start;
     new_gate->port_outputs = out;
-    new_gate->delay = 2; // FIX
+    new_gate->delay = delay; // FIX
     
 
     // ADD TO HASHMAP
