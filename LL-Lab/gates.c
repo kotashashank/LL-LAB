@@ -47,55 +47,45 @@ port_t port(const ptype_t pt, const char *name)
 void gate(const op_t op, const port_t out, const unsigned num_in, ...)
 {
 
+    //make new gate, except for input ports
+    gate_t new_gate = malloc(sizeof(struct gate));
+    new_gate->op = op;
+    new_gate->port_output = out;
+    new_gate->delay = delay;
+    
+
+
     // create one-dimensional input_port array
     va_list va;
     va_start(va, num_in);
 
-    //first input to gate (linked list of ports)
-    linked_list port_ins = malloc(sizeof(node));
-    port_t data = va_arg(va, port_t);
-    port_ins->data = (void *)(data);
-    port_ins->next = 0;
-
-    linked_list prevNode = port_ins;
-    //add ports to ll
-    for (int i = 1; i < num_in; i++) {
-        port_t portPointer = va_arg(va, port_t);
-        linked_list nextNode = malloc(sizeof(node));
-        nextNode->next = 0;
-        nextNode->data = (void *)(portPointer);
-
-        prevNode->next = nextNode;
-        prevNode = nextNode;
-        printf("adding port %d: port %s to this gate\n", i, portPointer->name);
-    }
-
-    va_end(va);
-
-    gate_t new_gate = malloc(sizeof(struct gate));
-
-    // set gate struct values
-    //update gate
-    new_gate->op = op;
-    new_gate->port_inputs = port_ins;
-    new_gate->port_output = out;
-    new_gate->delay = delay;
-
-    //connect input points to gate so can process when building graph
+    //create input list
     for (int i = 0; i < num_in; i++) {
-        linked_list new_node = malloc(sizeof(node));
-        new_node->data = new_gate;
+        port_t current = va_arg(va, port_t);
         
-        if (  ((pdata_t)(port_ins->data))->gates ==0) {//create if needed
-            new_node->next = 0;
-            ((pdata_t)(port_ins->data))->gates = new_node;
-        }
-        else {
-            new_node->next = ((pdata_t)(port_ins->data))->gates;//append if needed
-            ((pdata_t)(port_ins->data))->gates = new_node;
-        }
-        
+        linked_list newPortNode = malloc(sizeof(linked_list));
+        newPortNode->data = current;
+        newPortNode->next = new_gate->port_inputs;
+        new_gate->port_inputs = newPortNode;
+
+
+        linked_list newGateNode = malloc(sizeof(linked_list));
+        newGateNode->data = new_gate;
+        newGateNode->next = ((pdata_t) current->misc)->gates;
+        ((pdata_t) current->misc)->gates = newGateNode;
+
+        printf("adding port %d: port %s to this gate\n", i, current->name);
     }
+
+    linked_list currentPort = new_gate->port_inputs;
+    printf("ports in gate: ");
+    while(currentPort != NULL)
+    {
+        printf("%s, ", ((port_t) currentPort->data)->name);
+        currentPort = currentPort->next;
+    }
+    printf("\n");
+    va_end(va);
     
 }
 
