@@ -11,64 +11,64 @@
 unsigned delay;
 linked_list gates_delayed_processing;
 
-void freeLL(linked_list ll) {
-    while (ll) {
-        linked_list next = ll->next;
-        free(ll->data);
-        free(ll);
-        ll = next;
+// Frees memory used by nodes in linked list
+void freeLL(linked_list list) {
+    while (list != NULL) {
+        linked_list next = list->next;
+        free(list->data);
+        free(list);
+        list = next;
     }
 }
+
 // Initilizes a new port
 port_t port(const ptype_t pt, const char *name)
-{//in the future, we might need to add EXT_IN to global for memory management
-  
+{
+    //TODO: might need to add EXT_IN to global for memory management
     port_t new_port = malloc(sizeof(struct port));
     new_port->pt = pt;
     new_port->name = name;
+    // Create port data
     pdata_t misc_info = malloc(sizeof(struct port_data));
-    misc_info->isValid = 0;
+    misc_info->is_valid = 0;
     misc_info->gates = 0;
     misc_info->ports = 0;
-    //misc_info->ports = malloc(sizeof(port_t) * 3);//value doesn't matter b/c currently invalid
+
+    // Add port to port struct
     void * misc = (void *) (misc_info);
-    new_port->misc = misc; // every port starts undefined
+    new_port->misc = misc; // Every port starts undefined 
 
     printf("port added of type %i and of name %s\n", new_port->pt, new_port->name);
-
-
-    // TODO: ADD TO HASHMAP
 
     return new_port;
 
 }
 
 
+// Adds ports to gate's input and outputs and and gates to port's gate linked list
 void gate(const op_t op, const port_t out, const unsigned num_in, ...)
 {
 
-    //make new gate, except for input ports
+    // Make new gate, except for input ports
     gate_t new_gate = malloc(sizeof(struct gate));
     new_gate->op = op;
     new_gate->port_output = out;
     new_gate->delay = delay;
     
-
-
-    // create one-dimensional input_port array
     va_list va;
     va_start(va, num_in);
 
-    //create input list
+    // Iterate though list of inputs
     for (int i = 0; i < num_in; i++) {
         port_t current = va_arg(va, port_t);
         
+        // Create and add port node for gate's linked list
         linked_list newPortNode = malloc(sizeof(linked_list));
         newPortNode->data = current;
         newPortNode->next = new_gate->port_inputs;
         new_gate->port_inputs = newPortNode;
 
-
+        // Create and add gate node for port's linked list
         linked_list newGateNode = malloc(sizeof(linked_list));
         newGateNode->data = new_gate;
         newGateNode->next = ((pdata_t) current->misc)->gates;
@@ -77,83 +77,116 @@ void gate(const op_t op, const port_t out, const unsigned num_in, ...)
         printf("adding port %d: port %s to this gate\n", i, current->name);
     }
 
-    linked_list currentPort = new_gate->port_inputs;
-    printf("ports in gate: ");
-    while(currentPort != NULL)
-    {
-        printf("%s, ", ((port_t) currentPort->data)->name);
-        currentPort = currentPort->next;
-    }
-    printf("\n");
+    // Debugging code
+    // linked_list currentPort = new_gate->port_inputs;
+    // printf("ports in gate: ");
+    // while(currentPort != NULL)
+    // {
+    //     printf("%s, ", ((port_t) currentPort->data)->name);
+    //     currentPort = currentPort->next;
+    // }
+    // printf("\n");
+
     va_end(va);
     
 }
 
-logic_return AND(linked_list inputs) {//if valid 0, return false; otherwise indeterminant or true if all valid and ture
-    bool allInputValid = 1;
-    while (inputs) {
-        if( ((pdata_t)(inputs->data))->value == 0) {
-            if (((pdata_t)(inputs->data))->isValid ) {
-                logic_return definitely_false;
-                definitely_false.value = 0;
-                definitely_false.isValid = 1;
-                return definitely_false;
-            }
-        }
-        if (!((pdata_t)(inputs->data))->isValid) {//if its not valid
-            allInputValid = 0;
-        }
-        inputs = inputs->next;
-    }
-    logic_return ret;
-    ret.value = 1;
-    ret.value = allInputValid;
-    return ret;
-    //return 1;
-}
-
-logic_return OR(linked_list inputs) {//if there is a valid 1, its true; else it is either invalid or if all false then false
-    bool allInputValid = 1;
-    while (inputs) {
-        if( ((pdata_t)(inputs->data))->value == 1) {//we only need 1 valid 1 for it to be truly valid
-            if (((pdata_t)(inputs->data))->isValid ) {
-                logic_return definitely_false;
-                definitely_false.value = 1;
-                definitely_false.isValid = 1;
-                return definitely_false;
-            }
-        }
-        if (!((pdata_t)(inputs->data))->isValid) {//if its not valid
-            allInputValid = 0;
-        }
-        inputs = inputs->next;
-    }
-    logic_return ret;
-    ret.value = 0;
-    ret.value = allInputValid;
-    return ret;
+// Returns the output of an AND operation from a list of ports
+logic_return logical_AND(linked_list inputs) {
+    bool all_inputs_valid = TRUE;
+    logic_return output;
     
-}
+    // Iterate through each input
+    while (inputs != NULL) {
+        pdata_t pdata = (pdata_t) inputs->data;
 
-logic_return XOR(linked_list inputs) {//are there an odd number of ones
-    bool valReturn = 0;
-    logic_return log;
-    while (inputs) {
-        if (!(((pdata_t)(inputs->data))->isValid)) {
-            log.isValid = 0;
-            return log;//if its not valid it doesn't matter
-        }
-        if ((((pdata_t)(inputs->data))->value)) {
-            valReturn = !valReturn;
+        all_inputs_valid = all_inputs_valid && pdata->is_valid;
+        // Short circuit AND operation
+        if(!pdata->value) { 
+            output.value = FALSE;
+            output.is_valid = all_inputs_valid;
+            return output;
         }
         inputs = inputs->next;
     }
-    log.value = valReturn;
-    log.isValid = 1;
-    return log;
+    
+    output.value = TRUE;
+    output.value = all_inputs_valid;
+    return output;
 }
 
-void delayed_process_gate(gate_t g) { // add to list to process after current time stamp
+// Returns the output of an OR operation from a list of ports
+logic_return logical_OR(linked_list inputs) {
+    bool all_inputs_valid = TRUE;
+    logic_return output;
+
+    // Iterate through each input
+    while (inputs != NULL) {
+        pdata_t pdata = (pdata_t) inputs->data;
+
+        all_inputs_valid = all_inputs_valid && pdata->is_valid;
+        // Short circuit OR operation
+        if(pdata->value) { 
+            output.value = TRUE;
+            output.is_valid = all_inputs_valid;
+            return output;
+        }
+        inputs = inputs->next;
+    }
+    
+    output.value = FALSE;
+    output.value = all_inputs_valid;
+    return output;
+}
+
+// Returns the output of an XOR operation from a list of ports. Returns true if the number of TRUE values are odd.
+logic_return logical_XOR(linked_list inputs) {
+    bool return_value = FALSE;
+    logic_return output;
+
+    // Iterate through each input
+    while (inputs != NULL) {
+        pdata_t pdata = (pdata_t) inputs->data;
+        // Input is invalid, exit immediatly
+        if (!pdata->is_valid) {
+            output.is_valid = FALSE;
+            return output;
+        }
+        if (pdata->value) return_value = !return_value;
+        inputs = inputs->next;
+    }
+
+    output.value = return_value;
+    output.is_valid = TRUE;
+    return output;
+}
+
+// Returns the output of an NAND operation from a list of ports.
+logic_return logical_NAND(linked_list inputs) {
+    logic_return output = logical_AND(inputs);
+    output.value = !output.value;
+    return output;
+}
+
+// Returns the output of an NOR operation from a list of ports.
+logic_return logical_NOR(linked_list inputs) {
+    logic_return output = logical_OR(inputs);
+    output.value = !output.value;
+    return output;
+}
+
+logic_return logical_NOT(linked_list inputs) {
+    assert(inputs->next == NULL); // Make sure input list is size 1
+
+    logic_return output;
+    pdata_t input_data = (pdata_t) inputs ->data;
+    output.value = !input_data->value;
+    output.is_valid = input_data->is_valid;
+}
+
+
+// Add to list to process after current timestamp
+void delayed_process_gate(gate_t g) { 
 
     if (!gates_delayed_processing) {
         linked_list startNode = malloc(sizeof(node));
@@ -161,107 +194,91 @@ void delayed_process_gate(gate_t g) { // add to list to process after current ti
         startNode->next = 0;
         return;
     }
+
     linked_list current_place = gates_delayed_processing;
-    while (current_place) {//while its not null
-        if ((gate_t)current_place->data == g) {
-            return;
-        }
+    while (current_place) {
+        if ((gate_t)current_place->data == g) return;
+    }
+    
 
-    }//its not already in there
-
-    //we've reached end and ntohing there
+    // We've reached end and nothing there
     linked_list newGate = malloc(sizeof(node));
     newGate->data = (void *)(g);
     newGate->next = gates_delayed_processing;
     gates_delayed_processing = newGate;
-    //append this gate pointer to gates_delayed_processing
+
+    // Append this gate pointer to gates_delayed_processing
 }
 
-void process_delayed_gates() {//process all gates we left for later
+// Process all gates we left for later
+void process_delayed_gates() {
     linked_list current_place = gates_delayed_processing;
     while (current_place) {
         gate_t g = (gate_t)current_place->data;
         process_gate(g);
         linked_list old_place = current_place;
         current_place = current_place->next;
-        free(old_place);//freeing node b./c were done w/ it now
+        free(old_place); // Free node because we are done with it now
 
     }
     gates_delayed_processing = 0;
 }
-//process gate
+
+// Apply operations to gate inputs and change output
 void process_gate(gate_t g) {
-    //first make sure all values are valid
     op_t op = g->op;
-    logic_return out;
+    logic_return output;
+
+    // Execute operations on inputs
     switch (op) {
-        case OP_AND:
-            out = AND(g->port_inputs);
-            break;
-        case OP_ERROR:
-            printf("ERROR HERE gates.c\n");
-            assert(0);
-            break; 
-        case OP_NAND:
-            out = AND(g->port_inputs);
-            out.value = !out.value;
-            break;
-        case OP_NOT:
-            out.value = !(((pdata_t)(g->port_inputs->data))->value);
-            out.isValid = (((pdata_t)(g->port_inputs->data))->isValid);
-            //out = (((pdata_t)(g->port_inputs->data))->value);//this operation assumes it is valid b/c only 1 input 
-            break;
-        case OP_OR:
-            out = OR(g->port_inputs);
-            break;
-        case OP_NOR:
-            out = OR(g->port_inputs);
-            out.value = !out.value;
-            break;
-        case OP_XOR:
-            out = XOR(g->port_inputs); 
-            break;
-        default:
-            printf("FUCK, op is off \n");
-            assert(0);
-            break;
+        case OP_NOT: output = logical_NOT(g->port_inputs); break;
+        case OP_AND: output = logical_AND(g->port_inputs); break;
+        case OP_OR: output = logical_OR(g->port_inputs); break;
+        case OP_XOR: output = logical_XOR(g->port_inputs); break;
+        case OP_NAND: output = logical_NAND(g->port_inputs); break;
+        case OP_NOR: output = logical_NOR(g->port_inputs); break;
+        case OP_ERROR: printf("Error in gates.c\n"); assert(0);
     }
-    if (!out.isValid) {
-        return;//no use processing further, output is invalid
+
+    if (!output.is_valid) {
+        printf("Output is invalid");
+        return;
     }
-    if (out.value == ((pdata_t)g->port_output->misc)->value) {//and statement on two lines
-        bool isValid = ((pdata_t)(g->port_output->misc))->isValid;
-        if (isValid)
-         return;//value is always valid and not changing
+
+    // Note: ?
+    if (output.value == ((pdata_t)g->port_output->misc)->value) { //and statement on two lines
+        bool is_valid = ((pdata_t)(g->port_output->misc))->is_valid;
+        if (is_valid) return; //value is always valid and not changing
     }
-    //value is changing either val or isValid
+
+    // Add output to priorty queue
     node_t node = malloc(sizeof(struct pq_node));
     node->port = g->port_output;
-    node->new_value = out.value;
+    node->new_value = output.value;
     node->t = t + g->delay;
     insert(heap_array, node);
 };
 
+
 //init wire
 void wire(const port_t src, const port_t dst)
 {
-    // dst->val = src->val;
-    // dst->pt = src->pt;
+    pdata_t pdata = ((pdata_t) src->misc);
 
-    //add to front of linkedlist
-    if (((pdata_t)(src->misc))->ports ==0) {//if no ports, create linked list
+    // Add to front of linkedlist
+    if (pdata->ports == 0) { // If there are no ports, create a list
         linked_list portList = malloc(sizeof(node));
         portList->next = 0; 
         portList->data = (void *)(dst);
-        ((pdata_t)(src->misc))->ports = portList;
+        pdata->ports = portList;
         return;
     }
     //if linked list of ports, add this to front
-    linked_list next = ((pdata_t) src->misc)->ports;
+    linked_list next = pdata->ports;
     linked_list newData = malloc(sizeof(node));
     newData->data = (void *)(dst);
     newData->next = next;
-    ((pdata_t) src->misc)->ports = newData;
+    pdata->ports = newData;
     
 
 }
@@ -270,21 +287,24 @@ void wire(const port_t src, const port_t dst)
 // A timestep is of an arbitrary and unspecified number of seconds.
 void clock(const unsigned hi, const unsigned lo)
 {
-
+    // TODO
 }
 
 void set_port(port_t p, bool val)
 {
-    //if this is already true, quit
-    if (((pdata_t) p->misc)->value == val && ((pdata_t) p->misc)->isValid ==1)//all is already fine
+
+    pdata_t pdata = ((pdata_t) p->misc);
+
+    // If this is already true, quit
+    if (pdata->value == val && pdata->is_valid == TRUE) // Everything is already fine
         return;
 
-    //its being set so now valid
-    ((pdata_t) p->misc)->value = val;
-    ((pdata_t) p->misc)->isValid = 1;
+    // Its being set so now valid
+    pdata->value = val;
+    pdata->is_valid = TRUE;
 
-    //need to push children/gates/ports that are needed
-    linked_list port_children = ((pdata_t)(p->misc))->ports;
+    // Need to push children/gates/ports that are needed
+    linked_list port_children = pdata->ports;
     while (port_children) {
         port_t current_port = (port_t)(port_children->data);
         //its directly connected so need to set this port too
@@ -294,11 +314,11 @@ void set_port(port_t p, bool val)
         port_children = port_children->next;
     }
     
-    linked_list theGates = ((pdata_t)(p->misc))->gates;
+    linked_list theGates = pdata->gates;
 
-    //gate_t * theGate = &(((pdata_t)(p->misc))->nextGate);
-    while (theGates) {//there is a gate we need to process
-        //TIME COMPLEXITY REDUCTION: wait til done with all setting values before doing this
+    //gate_t * theGate = &pdata->nextGate;
+    while (theGates) { // There is a gate we need to process
+        // TIME COMPLEXITY REDUCTION: wait until finished with all setting values before doing this
         gate_t theGate = (gate_t)theGates->data;
         delayed_process_gate(theGate);//push to process after done w/ all of current time stamp
 
@@ -313,6 +333,7 @@ bool get_port(port_t p)
     //if(p->misc == UNDEFINED) assert(false);
     return ((pdata_t)p->misc)->value;
 }
+
 unsigned get_sim_time(void) {
     return t;
 }
@@ -321,6 +342,8 @@ void sim_init(void) {
     t=0;
     gates_delayed_processing = 0;
 }
+
+
 void sim_run(const unsigned nsteps) {
    t = t + nsteps;
    unsigned int lastTime = heap_array[0]->t;
@@ -334,7 +357,7 @@ void sim_run(const unsigned nsteps) {
            set_port(node_pointer->port, node_pointer->new_value);
            //go ahead and process this
        }
-       else {if (!((pdata_t)(node_pointer->port->misc))->isValid) {
+       else {if (!((pdata_t)(node_pointer->port->misc))->is_valid) {
            //go ahead and process it
            set_port(node_pointer->port, node_pointer->new_value);
        }}

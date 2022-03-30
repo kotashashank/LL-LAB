@@ -4,11 +4,8 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
-//TODOS
-//need global variable keeping track of all malloc that we can unmalloc at the end
-
-
-// troolean false/true/undefined
+// TODOS
+// Need global variable keeping track of all malloc that we can unmalloc at the end
 
 #define TRUE 1
 #define FALSE 0
@@ -64,7 +61,7 @@ typedef struct gate {
 
 typedef struct port_data {
     bool value;
-    bool isValid;
+    bool is_valid;
     linked_list gates;
     //gate_t nextGate;//null if no gate
     linked_list ports;
@@ -72,7 +69,7 @@ typedef struct port_data {
 } *pdata_t;
 
 typedef struct return_from_logic {
-    bool isValid;
+    bool is_valid;
     bool value;
 } logic_return;
 
