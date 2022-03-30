@@ -210,18 +210,6 @@ void process_gate(gate_t g) {
     node->new_value = out.value;
     node->t = t + g->delay;
     insert(heap_array, node);
-    //heap_array.insert()
-
-    /*
-
-typedef struct gate {
-    op_t op;
-    linked_list port_inputs;
-    port_t port_output;
-    int delay;
-} *gate_t;
-
-    */
 };
 
 //init wire

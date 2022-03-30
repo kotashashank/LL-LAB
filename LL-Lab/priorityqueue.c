@@ -88,7 +88,7 @@ void printArray(node_t array[], int size) {
 }
 
 // testing code
-int main() {
+/*int main() {
   
   
 
@@ -113,3 +113,5 @@ int main() {
   printArray(heap_array, size);
 
 }
+
+*/
