@@ -110,9 +110,8 @@ logic_return AND(linked_list inputs) {
         if (!((pdata_t)(inputs->data))->isValid) {//if its not valid
             allInputValid = 0;
         }
-        
+        inputs = inputs->next;
     }
-
     logic_return ret;
     ret.value = 1;
     ret.value = allInputValid;
@@ -120,6 +119,46 @@ logic_return AND(linked_list inputs) {
     //return 1;
 }
 
+logic_return OR(linked_list inputs) {
+    bool allInputValid = 1;
+    while (inputs) {
+        if( ((pdata_t)(inputs->data))->value == 1) {//we only need 1 valid 1 for it to be truly valid
+            if (((pdata_t)(inputs->data))->isValid ) {
+                logic_return definitely_false;
+                definitely_false.value = 1;
+                definitely_false.isValid = 1;
+                return definitely_false;
+            }
+        }
+        if (!((pdata_t)(inputs->data))->isValid) {//if its not valid
+            allInputValid = 0;
+        }
+        inputs = inputs->next;
+    }
+    logic_return ret;
+    ret.value = 0;
+    ret.value = allInputValid;
+    return ret;
+    
+}
+
+logic_return XOR(linked_list inputs) {//are there an odd number of ones
+    bool valReturn = 0;
+    logic_return log;
+    while (inputs) {
+        if (!(((pdata_t)(inputs->data))->isValid)) {
+            log.isValid = 0;
+            return log;//if its not valid it doesn't matter
+        }
+        if ((((pdata_t)(inputs->data))->value)) {
+            valReturn = !valReturn;
+        }
+        inputs = inputs->next;
+    }
+    log.value = valReturn;
+    log.isValid = 1;
+    return log;
+}
 //process gate
 void process_gate(gate_t g) {
     //first make sure all values are valid
@@ -135,16 +174,19 @@ void process_gate(gate_t g) {
             break; 
         case OP_NAND:
             out = AND(g->port_inputs);
-            out = !out;
+            out.value = !out.value;
             break;
         case OP_NOT:
-            out = !(((pdata_t)(g->port_inputs->data))->value);//this operation assumes it is valid b/c only 1 input 
+            out.value = !(((pdata_t)(g->port_inputs->data))->value);
+            out.isValid = (((pdata_t)(g->port_inputs->data))->isValid);
+            //out = (((pdata_t)(g->port_inputs->data))->value);//this operation assumes it is valid b/c only 1 input 
             break;
         case OP_OR:
             out = OR(g->port_inputs);
             break;
         case OP_NOR:
-            out = !OR(g->port_inputs);
+            out = OR(g->port_inputs);
+            out.value = !out.value;
             break;
         case OP_XOR:
             out = XOR(g->port_inputs); 
