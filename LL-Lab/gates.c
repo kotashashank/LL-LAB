@@ -173,7 +173,7 @@ logic_return XOR(linked_list inputs) {//are there an odd number of ones
     return log;
 }
 
-void delayed_process_gate(gate_t g) {
+void delayed_process_gate(gate_t g) { // add to list to process
 
     if (!gates_delayed_processing) {
         linked_list startNode = malloc(sizeof(node));
@@ -195,6 +195,16 @@ void delayed_process_gate(gate_t g) {
     newGate->next = gates_delayed_processing;
     gates_delayed_processing = newGate;
     //append this gate pointer to gates_delayed_processing
+}
+
+void process_delayed_gates() {
+    linked_list current_place = gates_delayed_processing;
+    while (current_place) {
+        gate_t g = (gate_t)current_place->data;
+        process_gate(g);
+
+        current_place = current_place->next;
+    }
 }
 //process gate
 void process_gate(gate_t g) {
@@ -327,6 +337,28 @@ void sim_init(void) {
 }
 void sim_run(const unsigned nsteps) {
    t = t + nsteps;
+   unsigned int lastTime = heap_array[0]->t;
+   while (heap_array[0]->t < t) {
+       if (heap_array[0]->t != lastTime) {
+           process_delayed_gates();
+           //process all delayed gates
+       }
+       node_t node_pointer = heap_array[0];
+       if (node_pointer->new_value != ((pdata_t)(node_pointer->port->misc))->value) {
+           set_port(node_pointer->port, node_pointer->new_value);
+           //go ahead and process this
+       }
+       else {if (!((pdata_t)(node_pointer->port->misc))->isValid) {
+           //go ahead and process it
+           set_port(node_pointer->port, node_pointer->new_value);
+       }}
+    
+   }
+   process_delayed_gates();
+   //go ahead and process all delayed gates
+
+
+
    //deleteRoot deletes the first one 
    //
    //while priority queue has stuff that needs to change of time less than t
