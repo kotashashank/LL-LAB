@@ -16,7 +16,7 @@ typedef struct pq_node {
 
 extern node_t heap_array[10];
 
-extern void insert(node_t array[], port_t new_port); 
+extern void insert(node_t array[], node_t new_port); 
 
 extern void deleteRoot(node_t array[]);
 

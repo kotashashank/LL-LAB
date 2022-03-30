@@ -45,11 +45,13 @@ void heapify(node_t array[], int size, int i) {
 }
 
 // Function to insert an element into the tree
-void insert(node_t array[], port_t new_port) {
+void insert(node_t array[], node_t new_port) {
 
-  node_t new_node = malloc(sizeof(node_t));
+  /*node_t new_node = malloc(sizeof(node_t));
   new_node->port = new_port;
-  new_node->t = t;
+  new_node->t = t;*/
+
+  node_t new_node = new_port;
 
   if (size == 0) {
     array[0] = new_node;

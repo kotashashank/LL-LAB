@@ -101,7 +101,6 @@ void process_gate(gate_t g) {
 
     op_t op = g->op;
     bool out;
-
     switch (op) {
         case OP_AND:
             out =  AND(g->port_inputs);
@@ -131,6 +130,19 @@ void process_gate(gate_t g) {
             assert(0);
             break;
     }
+    if (out == ((pdata_t)g->port_output->misc)->value) {//and statement on two lines
+        bool isValid = ((pdata_t)(g->port_output->misc))->isValid;
+        if (isValid)
+         return;//value is always valid and not changing
+    }
+    //value is changing either val or isValid
+    node_t node = malloc(sizeof(struct pq_node));
+    node->port = g->port_output;
+    node->new_value = out;
+    node->t = t + g->delay;
+    insert(heap_array, node);
+    //heap_array.insert()
+
     /*
 
 typedef struct gate {
