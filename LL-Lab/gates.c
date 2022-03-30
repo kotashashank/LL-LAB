@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <priorityqueue.h>
+#include "priorityqueue.h"
 #include "gates.h"
 
 // The delay of a gate.
@@ -108,9 +108,9 @@ void clock(const unsigned hi, const unsigned lo)
 
 void set_port(port_t p, bool val)
 {
-
-    p->misc = (short*) val;
-
+    ((pdata_t) p->misc)->value = val;
+    insert(heap_array, port);
+    printArray(heap_array, size);
 }
 bool get_port(port_t p)
 {
