@@ -2,6 +2,7 @@
 #define _GATES_H_
 
 #include <stdarg.h>
+#include <stdbool.h>
 
 //TODOS
 //need global variable keeping track of all malloc that we can unmalloc at the end
@@ -15,7 +16,7 @@
 
 // The delay of a gate.
 extern unsigned delay;
-
+extern unsigned t;
 
 
 // The different kinds of ports.
@@ -30,7 +31,7 @@ typedef enum ptype {
 
 typedef struct linked_list_node {
     void * data;
-    linked_list next;
+    struct linked_list_node *next;
 } node, *linked_list;
 
 //after gate calculations, update the ports associated with a gate with the correct values
