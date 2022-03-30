@@ -41,6 +41,7 @@ port_t port(const ptype_t pt, const char *name)
 
 }
 
+/* irrelevant unless Chat changes the code again (so like 90% chance its useful)
 void updateVals(linked_list listOfPorts, linked_list listOfValues) {
     while (listOfValues) {
          //void -> port_t * -> pdata_t -> value, isValid
@@ -53,35 +54,47 @@ void updateVals(linked_list listOfPorts, linked_list listOfValues) {
          assert(0);//still need to push these new ports to the priority queue
 
     }
-}
+}*/
 
 void gate(const op_t op, const port_t out, const unsigned num_in, ...)
 {
 
-    
     // create one-dimensional input_port array
     va_list va;
     va_start(va, num_in);
 
-    port_t port_inputs[num_in];
-    port_t *port_input_start = port_inputs;
+    linked_list port_ins = malloc(sizeof(node));
+    port_t data = va_arg(va, port_t);
+    port_ins->data = (void *)(data);
+    port_ins->next = 0;
 
-    for (int i = 0; i < num_in; i++) {
-        port_inputs[i] = va_arg(va, port_t);
-        printf("adding port %d: port %s to this gate\n", i, port_inputs[i]->name);
+    linked_list prevNode = port_ins;
+    for (int i = 1; i < num_in; i++) {
+        port_t portPointer = va_arg(va, port_t);
+        linked_list nextNode = malloc(sizeof(node));
+        nextNode->next = 0;
+        nextNode->data = (void *)(portPointer);
+
+        prevNode->next = nextNode;
+        prevNode = nextNode;
+        printf("adding port %d: port %s to this gate\n", i, portPointer->name);
     }
 
-    gate_t new_gate = malloc(sizeof(gate_t) + sizeof(port_inputs) * 2); // idk i hate c
+    gate_t new_gate = malloc(sizeof(gate_t));
 
-    // set gate struct
+    // set gate struct values
     new_gate->op = op;
-    new_gate->port_inputs = port_input_start;
-    new_gate->port_outputs = out;
-    new_gate->delay = 2; // FIX
-    
+    new_gate->port_inputs = port_ins;
+    new_gate->port_output = out;
+    new_gate->delay = delay;
 
-    // ADD TO HASHMAP
+    for (int i = 0; i < num_in; i++) {
+        ((pdata_t)(port_ins->data))->nextGate = new_gate;
+    }
 }
+
+//process gate
+void process_gate(struct gate g);
 
 //init wire
 void wire(const port_t src, const port_t dst)

@@ -3,6 +3,7 @@
 
 #include <stdarg.h>
 #include <stdbool.h>
+#include <priorityqueue.h>
 
 //TODOS
 //need global variable keeping track of all malloc that we can unmalloc at the end
@@ -34,8 +35,6 @@ typedef struct linked_list_node {
     struct linked_list_node *next;
 } node, *linked_list;
 
-//after gate calculations, update the ports associated with a gate with the correct values
-extern void updateVals(linked_list listOfPorts, linked_list listOfValues);
 
 extern void freeLL(linked_list node );
 
@@ -61,7 +60,7 @@ typedef enum op {
 typedef struct gate {
     op_t op;
     linked_list port_inputs;
-    linked_list port_outputs;
+    port_t port_output;
     //port_t port_inputs[3];
     //port_t port_outputs[3];
     int delay;
@@ -80,6 +79,8 @@ typedef struct port_data {
 extern port_t port(const ptype_t pt, const char *name);
 extern void gate(const op_t op, const port_t out, const unsigned num_in, ...);
 extern void wire(const port_t src, const port_t dst);
+
+void process_gate(struct gate g);
 
 // The remaining routines allow a test routine to simulate a given circuit for a number of timesteps.
 // A timestep is of an arbitrary and unspecified number of seconds.
