@@ -245,11 +245,11 @@ void process_gate(gate_t g) {
     }
 
     if (!output.is_valid) {
-        printf("Output is invalid\n");
+        //printf("Output is invalid\n");
         return;
     }
 
-    printf("output is valid\n");
+    //printf("output is valid\n");
 
     // Note: ?
     if (output.value == ((pdata_t)g->port_output->misc)->value) { //and statement on two lines
@@ -302,8 +302,6 @@ void clock(const unsigned hi, const unsigned lo)
 
 void set_port(port_t p, bool val)
 {
-    printf("setting port value \n");
-
     pdata_t pdata = ((pdata_t) p->misc);
 
     // If this is already true, quit
@@ -331,7 +329,6 @@ void set_port(port_t p, bool val)
     while (theGates) { // There is a gate we need to process
         // TIME COMPLEXITY REDUCTION: wait until finished with all setting values before doing this
         gate_t theGate = (gate_t)theGates->data;
-        printf("adding gate to process later\n");
         delayed_process_gate(theGate);//push to process after done w/ all of current time stamp
 
         theGates = theGates->next;
@@ -363,41 +360,41 @@ void sim_run(const unsigned nsteps) {
    //t = t + nsteps;
    int initial_t = t;
    if (gates_delayed_processing!=0) {//if gates left to process process then run again
-        printf("processing gates\n");
+   
        process_delayed_gates();
    }
    if (gates_delayed_processing==0) {
-       printf("no gates to process\n");
+       int iii = 0 ;//printf("no gates to process\n");
    }
-   if (!heap_array[0])
+   if (!seeFirst())
         {
-            printf("heap array is empty\n");
+            //printf("heap array is empty\n");
             t = initial_t + nsteps;
             return;
         }
-   unsigned int lastTime = heap_array[0]->t;
-   while (heap_array[0] && heap_array[0]->t <= initial_t+nsteps) {//while stuff to pop, pop it
-        printf("in sim_run while for time of %08x\n", heap_array[0]->t);
-       if (heap_array[0]->t != lastTime) {//process delayed gates if there's a time difference
+   unsigned int lastTime = seeFirst()->t;
+   while (size!=0 && seeFirst() && seeFirst()->t <= initial_t+nsteps) {//while stuff to pop, pop it
+        //printf("in sim_run while for time of %08x\n", seeFirst()->t);
+       if (seeFirst()->t != lastTime) {//process delayed gates if there's a time difference
            process_delayed_gates();
            //process all delayed gates
        }
-       printf("processing port\n");
-       node_t node_pointer = heap_array[0];
+       //printf("processing port\n");
+       node_t node_pointer = seeFirst();
        deleteRoot(heap_array);
        if (node_pointer->new_value != ((pdata_t)(node_pointer->port->misc))->value) {
-           printf("processing node w/ time of %08x\n", node_pointer->t);
+           //printf("processing node w/ time of %08x\n", node_pointer->t);
            set_port(node_pointer->port, node_pointer->new_value);
            //go ahead and process this
        }
        else {if (!((pdata_t)(node_pointer->port->misc))->is_valid) {
            //go ahead and process it
-           printf("processing node w/ time of %08x\n", node_pointer->t);
+           //printf("processing node w/ time of %08x\n", node_pointer->t);
            set_port(node_pointer->port, node_pointer->new_value);
        }}
 
-       if (heap_array[0])
-         t = min(initial_t + nsteps, heap_array[0]->t);
+       if (seeFirst())
+         t = min(initial_t + nsteps, seeFirst()->t);
        else 
          {
              t = initial_t + nsteps;
@@ -406,7 +403,7 @@ void sim_run(const unsigned nsteps) {
     
    }
    if (gates_delayed_processing!=0) {//if gates left to process process then run again
-       printf("processing gates\n");
+       //printf("processing gates\n");
        process_delayed_gates();
        sim_run(0);
    }

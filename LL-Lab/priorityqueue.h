@@ -24,6 +24,8 @@ extern node_t heap_array[10];
 
 extern void insert(node_t array[], node_t new_port); 
 
+extern struct pq_node * seeFirst();
+
 extern void deleteRoot(node_t array[]);
 
 extern void printArray(node_t array[], int size);
