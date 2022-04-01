@@ -14,6 +14,7 @@
 int size = 0;
 unsigned t;
 node_t heap_array[];
+struct pq_linked_list * pq_global_ll = 0;
 
 
 void swap(node_t *a, node_t *b) {
@@ -58,7 +59,7 @@ void insert(node_t array[], node_t new_port) {
     newLL->next = pq_global_ll;
   }
   pq_global_ll = newLL; 
-  return;
+  //return;
   /*node_t new_node = malloc(sizeof(node_t));
   new_node->port = new_port;
   new_node->t = t;*/
@@ -79,6 +80,10 @@ void insert(node_t array[], node_t new_port) {
 
 // Function to delete an element from the tree
 void deleteRoot(node_t array[]) {
+
+
+
+
   int i;
   for (i = 0; i < size; i++) {
     if (&array[0] == &array[i])

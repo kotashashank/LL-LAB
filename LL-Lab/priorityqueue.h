@@ -14,12 +14,12 @@ typedef struct pq_node {
   bool new_value;
 } *node_t; 
 
-typedef struct ll {
+typedef struct pq_linked_list {
   node_t node;
-  ll next;
+  struct pq_linked_list * next;
 } * ll;
 
-extern ll linked_list;
+extern struct pq_linked_list * pq_global_ll;
 extern node_t heap_array[10];
 
 extern void insert(node_t array[], node_t new_port); 
