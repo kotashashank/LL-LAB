@@ -47,6 +47,18 @@ void heapify(node_t array[], int size, int i) {
 // Function to insert an element into the tree
 void insert(node_t array[], node_t new_port) {
 
+  ll newLL = malloc(sizeof(struct pq_linked_list));//using linked list priority queue instead so can test everything else
+  newLL->node = new_port;
+  if (pq_global_ll==0) {
+    
+    newLL->next = 0;
+    
+  }
+  else {
+    newLL->next = pq_global_ll;
+  }
+  pq_global_ll = newLL; 
+  return;
   /*node_t new_node = malloc(sizeof(node_t));
   new_node->port = new_port;
   new_node->t = t;*/
@@ -83,7 +95,10 @@ void deleteRoot(node_t array[]) {
 // Print the array
 void printArray(node_t array[], int size) {
   for (int i = 0; i < size; ++i)
-    printf("[name: %s time: %d]", array[i]->port->name, array[i]->t);
+    {
+      if (array[i])
+        printf("[name: %s time: %d]", array[i]->port->name, array[i]->t);
+    }
   printf("\n");
 }
 

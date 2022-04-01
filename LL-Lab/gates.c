@@ -7,6 +7,8 @@
 #include "priorityqueue.h"
 #include "gates.h"
 
+//https://www.freecodecamp.org/news/reactjs-implement-drag-and-drop-feature-without-using-external-libraries-ad8994429f1a/
+
 // The delay of a gate.
 unsigned delay;
 linked_list gates_delayed_processing;
@@ -102,9 +104,9 @@ logic_return logical_AND(linked_list inputs) {
 
         all_inputs_valid = all_inputs_valid && pdata->is_valid;
         // Short circuit AND operation
-        if(!pdata->value) { 
+        if(!pdata->value && pdata->is_valid) { 
             output.value = FALSE;
-            output.is_valid = all_inputs_valid;
+            output.is_valid = TRUE;// all_inputs_valid;
             return output;
         }
         inputs = inputs->next;
@@ -126,9 +128,9 @@ logic_return logical_OR(linked_list inputs) {
 
         all_inputs_valid = all_inputs_valid && pdata->is_valid;
         // Short circuit OR operation
-        if(pdata->value) { 
+        if(pdata->value && pdata->is_valid) { //if its valid, then its definitely true, if not it doesn't matter
             output.value = TRUE;
-            output.is_valid = all_inputs_valid;
+            output.is_valid = TRUE;//all_inputs_valid;
             return output;
         }
         inputs = inputs->next;
@@ -192,12 +194,14 @@ void delayed_process_gate(gate_t g) {
         linked_list startNode = malloc(sizeof(node));
         startNode->data = (void *)(g);
         startNode->next = 0;
+        gates_delayed_processing = startNode;
         return;
     }
 
     linked_list current_place = gates_delayed_processing;
-    while (current_place) {
+    while (current_place) {//if it already exists, skip
         if ((gate_t)current_place->data == g) return;
+        current_place = current_place->next;
     }
     
 
@@ -241,9 +245,11 @@ void process_gate(gate_t g) {
     }
 
     if (!output.is_valid) {
-        printf("Output is invalid");
+        printf("Output is invalid\n");
         return;
     }
+
+    printf("output is valid\n");
 
     // Note: ?
     if (output.value == ((pdata_t)g->port_output->misc)->value) { //and statement on two lines
@@ -256,7 +262,11 @@ void process_gate(gate_t g) {
     node->port = g->port_output;
     node->new_value = output.value;
     node->t = t + g->delay;
+    printf("adding node to priority queue with time of %08x\n", node->t);
+    printArray(heap_array, size);
+    assert(node!=0);
     insert(heap_array, node);
+    printArray(heap_array, size);
 };
 
 
@@ -292,6 +302,7 @@ void clock(const unsigned hi, const unsigned lo)
 
 void set_port(port_t p, bool val)
 {
+    printf("setting port value \n");
 
     pdata_t pdata = ((pdata_t) p->misc);
 
@@ -320,6 +331,7 @@ void set_port(port_t p, bool val)
     while (theGates) { // There is a gate we need to process
         // TIME COMPLEXITY REDUCTION: wait until finished with all setting values before doing this
         gate_t theGate = (gate_t)theGates->data;
+        printf("adding gate to process later\n");
         delayed_process_gate(theGate);//push to process after done w/ all of current time stamp
 
         theGates = theGates->next;
@@ -343,29 +355,62 @@ void sim_init(void) {
     gates_delayed_processing = 0;
 }
 
+int min(int one, int two) {
+    return one < two ? one : two;
+}
 
 void sim_run(const unsigned nsteps) {
-   t = t + nsteps;
+   //t = t + nsteps;
+   int initial_t = t;
+   if (gates_delayed_processing!=0) {//if gates left to process process then run again
+        printf("processing gates\n");
+       process_delayed_gates();
+   }
+   if (gates_delayed_processing==0) {
+       printf("no gates to process\n");
+   }
+   if (!heap_array[0])
+        {
+            printf("heap array is empty\n");
+            t = initial_t + nsteps;
+            return;
+        }
    unsigned int lastTime = heap_array[0]->t;
-   while (heap_array[0]->t < t) {//while stuff to pop, pop it
+   while (heap_array[0] && heap_array[0]->t <= initial_t+nsteps) {//while stuff to pop, pop it
+        printf("in sim_run while for time of %08x\n", heap_array[0]->t);
        if (heap_array[0]->t != lastTime) {//process delayed gates if there's a time difference
            process_delayed_gates();
            //process all delayed gates
        }
+       printf("processing port\n");
        node_t node_pointer = heap_array[0];
+       deleteRoot(heap_array);
        if (node_pointer->new_value != ((pdata_t)(node_pointer->port->misc))->value) {
+           printf("processing node w/ time of %08x\n", node_pointer->t);
            set_port(node_pointer->port, node_pointer->new_value);
            //go ahead and process this
        }
        else {if (!((pdata_t)(node_pointer->port->misc))->is_valid) {
            //go ahead and process it
+           printf("processing node w/ time of %08x\n", node_pointer->t);
            set_port(node_pointer->port, node_pointer->new_value);
        }}
+
+       if (heap_array[0])
+         t = min(initial_t + nsteps, heap_array[0]->t);
+       else 
+         {
+             t = initial_t + nsteps;
+         }
+        
     
    }
    if (gates_delayed_processing!=0) {//if gates left to process process then run again
+       printf("processing gates\n");
        process_delayed_gates();
        sim_run(0);
    }
+
+    t = initial_t + nsteps;
    
 }
