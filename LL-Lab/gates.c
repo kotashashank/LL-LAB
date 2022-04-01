@@ -119,6 +119,7 @@ logic_return logical_AND(linked_list inputs) {
 
 // Returns the output of an OR operation from a list of ports
 logic_return logical_OR(linked_list inputs) {
+    printf("in logical OR\n");
     bool all_inputs_valid = TRUE;
     logic_return output;
 
@@ -135,9 +136,13 @@ logic_return logical_OR(linked_list inputs) {
         }
         inputs = inputs->next;
     }
-    
+    if (!all_inputs_valid) {
+        printf("OR not valid\n");
+        return;
+    } 
+
     output.value = FALSE;
-    output.value = all_inputs_valid;
+    output.is_valid = 1;
     return output;
 }
 
@@ -230,6 +235,8 @@ void process_delayed_gates() {
 
 // Apply operations to gate inputs and change output
 void process_gate(gate_t g) {
+
+    printf("at time %08x, processing gate of value %02x\n", t, g->op);
     op_t op = g->op;
     logic_return output;
 
@@ -302,6 +309,7 @@ void clock(const unsigned hi, const unsigned lo)
 
 void set_port(port_t p, bool val)
 {
+    printf("updating port %0s with value %01x\n", p->name, val);
     pdata_t pdata = ((pdata_t) p->misc);
 
     // If this is already true, quit
