@@ -100,7 +100,7 @@ logic_return logical_AND(linked_list inputs) {
     
     // Iterate through each input
     while (inputs != NULL) {
-        pdata_t pdata = (pdata_t) inputs->data;
+        pdata_t pdata = (pdata_t)(((port_t) (inputs->data))->misc);
 
         all_inputs_valid = all_inputs_valid && pdata->is_valid;
         // Short circuit AND operation
@@ -125,13 +125,15 @@ logic_return logical_OR(linked_list inputs) {
 
     // Iterate through each input
     while (inputs != NULL) {
-        pdata_t pdata = (pdata_t) inputs->data;
+        pdata_t pdata = (pdata_t)(((port_t) (inputs->data))->misc);
 
         all_inputs_valid = all_inputs_valid && pdata->is_valid;
         // Short circuit OR operation
         if(pdata->value && pdata->is_valid) { //if its valid, then its definitely true, if not it doesn't matter
+            printf("%s\n", inputs->data);
             output.value = TRUE;
             output.is_valid = TRUE;//all_inputs_valid;
+            printf("its true and its valid\n");
             return output;
         }
         inputs = inputs->next;
@@ -143,6 +145,7 @@ logic_return logical_OR(linked_list inputs) {
 
     output.value = FALSE;
     output.is_valid = 1;
+    printf("false n valid\n");
     return output;
 }
 
@@ -153,7 +156,7 @@ logic_return logical_XOR(linked_list inputs) {
 
     // Iterate through each input
     while (inputs != NULL) {
-        pdata_t pdata = (pdata_t) inputs->data;
+        pdata_t pdata = (pdata_t)(((port_t) (inputs->data))->misc);
         // Input is invalid, exit immediatly
         if (!pdata->is_valid) {
             output.is_valid = FALSE;
@@ -186,7 +189,8 @@ logic_return logical_NOT(linked_list inputs) {
     assert(inputs->next == NULL); // Make sure input list is size 1
 
     logic_return output;
-    pdata_t input_data = (pdata_t) inputs ->data;
+    //pdata_t input_data = (pdata_t) inputs ->data;
+    pdata_t input_data = (pdata_t)(((port_t) (inputs->data))->misc);
     output.value = !input_data->value;
     output.is_valid = input_data->is_valid;
 }
@@ -309,12 +313,18 @@ void clock(const unsigned hi, const unsigned lo)
 
 void set_port(port_t p, bool val)
 {
-    printf("updating port %0s with value %01x\n", p->name, val);
-    pdata_t pdata = ((pdata_t) p->misc);
+    printf("updating port %s with value %01x\n", p->name, val);
+    pdata_t pdata = ((pdata_t) (p->misc));
 
     // If this is already true, quit
     if (pdata->value == val && pdata->is_valid == TRUE) // Everything is already fine
-        return;
+        
+        
+        {
+            printf("nothing changing with port %s\n", p->name);
+            return;
+        }
+            
 
     // Its being set so now valid
     pdata->value = val;
@@ -348,7 +358,7 @@ void set_port(port_t p, bool val)
 bool get_port(port_t p)
 {
     //if(p->misc == UNDEFINED) assert(false);
-    return ((pdata_t)p->misc)->value;
+    return ((pdata_t)(p->misc))->value;
 }
 
 unsigned get_sim_time(void) {
@@ -390,16 +400,8 @@ void sim_run(const unsigned nsteps) {
        //printf("processing port\n");
        node_t node_pointer = seeFirst();
        deleteRoot(heap_array);
-       if (node_pointer->new_value != ((pdata_t)(node_pointer->port->misc))->value) {
-           //printf("processing node w/ time of %08x\n", node_pointer->t);
-           set_port(node_pointer->port, node_pointer->new_value);
-           //go ahead and process this
-       }
-       else {if (!((pdata_t)(node_pointer->port->misc))->is_valid) {
-           //go ahead and process it
-           //printf("processing node w/ time of %08x\n", node_pointer->t);
-           set_port(node_pointer->port, node_pointer->new_value);
-       }}
+       set_port(node_pointer->port, node_pointer->new_value);
+
 
        if (seeFirst())
          t = min(initial_t + nsteps, seeFirst()->t);
