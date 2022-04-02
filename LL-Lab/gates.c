@@ -119,7 +119,7 @@ logic_return logical_AND(linked_list inputs) {
 
 // Returns the output of an OR operation from a list of ports
 logic_return logical_OR(linked_list inputs) {
-    printf("in logical OR\n");
+    
     bool all_inputs_valid = TRUE;
     logic_return output;
 
@@ -130,22 +130,22 @@ logic_return logical_OR(linked_list inputs) {
         all_inputs_valid = all_inputs_valid && pdata->is_valid;
         // Short circuit OR operation
         if(pdata->value && pdata->is_valid) { //if its valid, then its definitely true, if not it doesn't matter
-            printf("%s\n", inputs->data);
+            //printf("%s\n", inputs->data);
             output.value = TRUE;
             output.is_valid = TRUE;//all_inputs_valid;
-            printf("its true and its valid\n");
+            //printf("its true and its valid\n");
             return output;
         }
         inputs = inputs->next;
     }
     if (!all_inputs_valid) {
-        printf("OR not valid\n");
+        //printf("OR not valid\n");
         return;
     } 
 
     output.value = FALSE;
     output.is_valid = 1;
-    printf("false n valid\n");
+    
     return output;
 }
 
@@ -240,7 +240,7 @@ void process_delayed_gates() {
 // Apply operations to gate inputs and change output
 void process_gate(gate_t g) {
 
-    printf("at time %08x, processing gate of value %02x\n", t, g->op);
+    //printf("at time %08x, processing gate of value %02x\n", t, g->op);
     op_t op = g->op;
     logic_return output;
 
@@ -273,11 +273,11 @@ void process_gate(gate_t g) {
     node->port = g->port_output;
     node->new_value = output.value;
     node->t = t + g->delay;
-    printf("adding node to priority queue with time of %08x\n", node->t);
-    printArray(heap_array, size);
+    //printf("adding node to priority queue with time of %08x\n", node->t);
+    //printArray(heap_array, size);
     assert(node!=0);
     insert(heap_array, node);
-    printArray(heap_array, size);
+    //printArray(heap_array, size);
 };
 
 
@@ -313,7 +313,7 @@ void clock(const unsigned hi, const unsigned lo)
 
 void set_port(port_t p, bool val)
 {
-    printf("updating port %s with value %01x\n", p->name, val);
+    //printf("updating port %s with value %01x\n", p->name, val);
     pdata_t pdata = ((pdata_t) (p->misc));
 
     // If this is already true, quit
@@ -321,7 +321,7 @@ void set_port(port_t p, bool val)
         
         
         {
-            printf("nothing changing with port %s\n", p->name);
+            //printf("nothing changing with port %s\n", p->name);
             return;
         }
             

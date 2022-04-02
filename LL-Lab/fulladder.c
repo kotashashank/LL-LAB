@@ -54,9 +54,9 @@ int main(void) {
     delay = 2;
     fulladder(A, B, C, S, D);
     unsigned t = get_sim_time();
-    for (int i = 1; i < 2; i++) {
-        for (int j = 1; j < 2; j++) {
-            for (int k = 1; k < 2; k++) {
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) {
+            for (int k = 0; k < 2; k++) {
                 set_port(A, i%2 == 0);
                 set_port(B, j%2 == 0);
                 set_port(C, k%2 == 0);
