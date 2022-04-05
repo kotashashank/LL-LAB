@@ -7,8 +7,8 @@ all: runner
 gates.o: gates.c gates.h priorityqueue.h
 priorityqueue.o: priorityqueue.c priorityqueue.h gates.h
 
-runner: fulladder.c gates.o priorityqueue.o
-	$(CC) $(CFLAGS) -o runner fulladder.c gates.o priorityqueue.o
+runner: gates.o priorityqueue.o fulladder.c
+	$(CC) $(CFLAGS) -o runner fulladder.c  gates.o priorityqueue.o 
 
 clean:
-	rm -f *.o
+	rm -f *.o runner r2 

@@ -7,8 +7,6 @@
 #include "priorityqueue.h"
 #include "gates.h"
 
-//https://www.freecodecamp.org/news/reactjs-implement-drag-and-drop-feature-without-using-external-libraries-ad8994429f1a/
-
 // The delay of a gate.
 unsigned delay;
 linked_list gates_delayed_processing;
