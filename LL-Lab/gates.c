@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "priorityqueue.h"
 #include "gates.h"
+#include <string.h>
 
 // The delay of a gate.
 unsigned delay;
@@ -30,9 +31,9 @@ port_t port(const ptype_t pt, const char *name)
     new_port->name = name;
     // Create port data
     pdata_t misc_info = malloc(sizeof(struct port_data));
-    misc_info->is_valid = 0;
-    misc_info->gates = 0;
-    misc_info->ports = 0;
+    misc_info->is_valid = false;
+    misc_info->gates = false;
+    misc_info->ports = false;
 
     // Add port to port struct
     void * misc = (void *) (misc_info);
@@ -138,7 +139,9 @@ logic_return logical_OR(linked_list inputs) {
     }
     if (!all_inputs_valid) {
         //printf("OR not valid\n");
-        return;
+        output.is_valid = 0;
+
+        return output;
     } 
 
     output.value = FALSE;
@@ -313,7 +316,9 @@ void set_port(port_t p, bool val)
 {
     //printf("updating port %s with value %01x\n", p->name, val);
     pdata_t pdata = ((pdata_t) (p->misc));
-
+    if (p->name && 0==strcmp("_Cout",p->name)) {
+        printf("considering changing bad value\n");
+    }
     // If this is already true, quit
     if (pdata->value == val && pdata->is_valid == TRUE) // Everything is already fine
         

@@ -8,6 +8,7 @@ if os.environ.get('DISPLAY','') == '':
     os.environ.__setitem__('DISPLAY', ':0.0')
 
 def run():
+    print("doing the run")
     correct = subprocess.run(
         ["./runner"],
         universal_newlines=True,
@@ -15,6 +16,11 @@ def run():
         stderr=subprocess.PIPE
     )
     print(correct)
+    output = correct.stdout 
+    print()
+    print()
+    print()
+    print(output)
     # print('outputed')
 
 def create_canvas():
