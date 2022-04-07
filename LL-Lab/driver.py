@@ -40,8 +40,7 @@ def parse_data(output):
             signals_array[i - 1].append(bool(int(s)))
 
         i += 1
-            
-    print(signals_array[4])
+        
     return (signals_array, times_array, input_amount)
 
     
@@ -63,7 +62,7 @@ def get_ports(output_array):
 
 def run():
     correct = subprocess.run(
-        ["./runner"],
+        ["./runner2"],
         universal_newlines=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
@@ -154,14 +153,21 @@ def create_signals(signals_array, time_array, input_amount, graph_height, graph_
         current_x += signal_width
     
 
+def create_ticks(time_array, x_init, y, graph_width):
+    x_inc = graph_width/len(time_array)
+
+    for i in range(0, len(time_array)):
+        canvas.create_line(x_init + x_inc*i + x_inc, y - 7.5, x_init + x_inc*i + x_inc, y + 10, fill='black', width=1.5)
+
 
 
 
 canvas.create_line(100, 750, 100, 100, fill='black', width=5)
 canvas.create_line(100, 750, 900, 750, fill='black', width=5)
 
-c_output = run() # 0 -> signal array | #1 -> input amount
 
+c_output = run() # 0 -> signal array | #1 -> input amount
+create_ticks(c_output[1], 100, 750, 800)
 
 create_signals(c_output[0], c_output[1], c_output[2], 650, 800, 100, 100, fillIn='green', fillOut='red', width=4, step=0.015)
 

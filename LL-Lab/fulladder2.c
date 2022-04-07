@@ -32,8 +32,6 @@ void fulladder(port_t ain, port_t bin, port_t cin, port_t sum, port_t cout) {
     assert(PTYPE_EXT_OUT == sum->pt);
     assert(PTYPE_EXT_OUT == cout->pt);
 
-
-
     port_t HA1a = port(PTYPE_IN, "_HA1a");
     port_t HA1b = port(PTYPE_IN, "_HA1b");
     port_t HA1s = port(PTYPE_OUT, "_HA1s");
@@ -65,12 +63,11 @@ int main(void) {
     port_t D = port(PTYPE_EXT_OUT, NULL);
 
     delay = 2;
-    
+    fulladder(A, B, C, S, D);
     unsigned t = get_sim_time();
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
             for (int k = 0; k < 2; k++) {
-                fulladder(A, B, C, S, D);
                 set_port(A, i%2 == 0);
                 set_port(B, j%2 == 0);
                 set_port(C, k%2 == 0);
