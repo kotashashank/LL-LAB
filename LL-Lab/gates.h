@@ -21,6 +21,7 @@ typedef enum ptype {
     PTYPE_OUT,
     PTYPE_EXT_IN,
     PTYPE_EXT_OUT,
+    PTYPE_CLK,
     PTYPE_ERR = -1
 } ptype_t;
 
@@ -82,7 +83,7 @@ void process_gate(gate_t g);
 
 // The remaining routines allow a test routine to simulate a given circuit for a number of timesteps.
 // A timestep is of an arbitrary and unspecified number of seconds.
-extern void clock(const unsigned hi, const unsigned lo);
+extern port_t clock(const unsigned hi, const unsigned lo);
 
 extern void set_port(port_t p, bool val);
 extern bool get_port(port_t p);
@@ -90,5 +91,6 @@ extern unsigned get_sim_time(void);
 
 extern void sim_init(void);
 extern void sim_run(const unsigned nsteps);
+extern void sim_exit(void);
 
 #endif 

@@ -327,7 +327,7 @@ void wire(const port_t src, const port_t dst)
 
 // The remaining routines allow a test routine to simulate a given circuit for a number of timesteps.
 // A timestep is of an arbitrary and unspecified number of seconds.
-void clock(const unsigned hi, const unsigned lo)
+port_t clock(const unsigned hi, const unsigned lo)
 {
     // TODO
 }
