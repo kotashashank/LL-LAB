@@ -33,15 +33,8 @@ void fulladder(port_t ain, port_t bin, port_t cin, port_t sum, port_t cout) {
     wire(HA1s, HA2a); wire(cin, HA2b);
     wire(HA1d, Cout1); wire(HA2d, Cout2);
     wire(HA2s, sum); wire(Cout, cout);
-
-    /*linked_list current = ((pdata_t)(HA1a->misc))->gates;
-    while(current != NULL && current->data != NULL) {
-        printf("port !!");
-        printf("port %i | ", ((gate_t) (current->data))->op);
-        current = current->next;
-    }
-    printf("\n");*/
 }
+
 int main(void) {
 
 
@@ -61,7 +54,6 @@ int main(void) {
                 set_port(B, j%2 == 0);
                 set_port(C, k%2 == 0);
                 
-                printArray(heap_array, size);
                 for (int n = 0; n < 10; n++) {
                     printf("[%du] %d %d %d %d %d\n", 
                         t, get_port(A), get_port(B), get_port(C), get_port(S), get_port(D));

@@ -364,6 +364,7 @@ int min(int one, int two) {
     return one < two ? one : two;
 }
 
+
 void sim_run(const unsigned nsteps) {
    //t = t + nsteps;
    int initial_t = t;
@@ -374,12 +375,12 @@ void sim_run(const unsigned nsteps) {
    if (gates_delayed_processing==0) {
        int iii = 0 ;//printf("no gates to process\n");
    }
-//    if (!seeFirst())
-//         {
-//             //printf("heap array is empty\n");
-//             t = initial_t + nsteps;
-//             return;
-//         }
+   if (!seeFirst())
+        {
+            //printf("heap array is empty\n");
+            t = initial_t + nsteps;
+            return;
+        }
    unsigned int lastTime = seeFirst()->t;
    while (size!=0 && seeFirst() && seeFirst()->t <= initial_t+nsteps) {//while stuff to pop, pop it
         //printf("in sim_run while for time of %08x\n", seeFirst()->t);
