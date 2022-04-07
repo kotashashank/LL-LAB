@@ -111,7 +111,7 @@ logic_return logical_AND(linked_list inputs) {
     }
     
     output.value = TRUE;
-    output.value = all_inputs_valid;
+    output.is_valid = all_inputs_valid;
     return output;
 }
 
@@ -138,7 +138,8 @@ logic_return logical_OR(linked_list inputs) {
     }
     if (!all_inputs_valid) {
         //printf("OR not valid\n");
-        return;
+        output.is_valid = 0;
+        return output;
     } 
 
     output.value = FALSE;
@@ -225,7 +226,7 @@ void delayed_process_gate(gate_t g) {
 void process_delayed_gates() {
     linked_list current_place = gates_delayed_processing;
     while (current_place) {
-        gate_t g = (gate_t)current_place->data;
+        gate_t g = current_place->data;
         process_gate(g);
         linked_list old_place = current_place;
         current_place = current_place->next;
