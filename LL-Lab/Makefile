@@ -1,7 +1,7 @@
 # Definitions
 
 CC = gcc
-CC_FLAGS = -Wall -ggdb -g
+CC_FLAGS = -Wall -Werror -ggdb -g -O
 
 all: runner
 gates.o: gates.c gates.h priorityqueue.h

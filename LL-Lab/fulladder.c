@@ -60,6 +60,7 @@ int main(void) {
                 set_port(A, i%2 == 0);
                 set_port(B, j%2 == 0);
                 set_port(C, k%2 == 0);
+                
                 printArray(heap_array, size);
                 for (int n = 0; n < 10; n++) {
                     printf("[%du] %d %d %d %d %d\n", 

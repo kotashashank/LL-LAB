@@ -38,7 +38,7 @@ port_t port(const ptype_t pt, const char *name)
     void * misc = (void *) (misc_info);
     new_port->misc = misc; // Every port starts undefined 
 
-    printf("port added of type %i and of name %s\n", new_port->pt, new_port->name);
+    //printf("port added of type %i and of name %s\n", new_port->pt, new_port->name);
 
     return new_port;
 
@@ -74,7 +74,7 @@ void gate(const op_t op, const port_t out, const unsigned num_in, ...)
         newGateNode->next = ((pdata_t) current->misc)->gates;
         ((pdata_t) current->misc)->gates = newGateNode;
 
-        printf("adding port %d: port %s to this gate\n", i, current->name);
+       // printf("adding port %d: port %s to this gate\n", i, current->name);
     }
 
     // Debugging code
@@ -91,9 +91,11 @@ void gate(const op_t op, const port_t out, const unsigned num_in, ...)
     
 }
 
+
 // Returns the output of an AND operation from a list of ports
 logic_return logical_AND(linked_list inputs) {
     bool all_inputs_valid = TRUE;
+    bool output_value = TRUE;
     logic_return output;
     
     // Iterate through each input
@@ -101,17 +103,12 @@ logic_return logical_AND(linked_list inputs) {
         pdata_t pdata = (pdata_t)(((port_t) (inputs->data))->misc);
 
         all_inputs_valid = all_inputs_valid && pdata->is_valid;
-        // Short circuit AND operation
-        if(!pdata->value && pdata->is_valid) { 
-            output.value = FALSE;
-            output.is_valid = TRUE;// all_inputs_valid;
-            return output;
-        }
+        output_value = pdata->value && output_value;
         inputs = inputs->next;
     }
     
-    output.value = TRUE;
-    output.value = all_inputs_valid;
+    output.value = output_value;
+    output.is_valid = all_inputs_valid;
     return output;
 }
 
@@ -120,35 +117,27 @@ logic_return logical_OR(linked_list inputs) {
     
     bool all_inputs_valid = TRUE;
     logic_return output;
-
+    bool output_value = FALSE;
     // Iterate through each input
     while (inputs != NULL) {
         pdata_t pdata = (pdata_t)(((port_t) (inputs->data))->misc);
 
         all_inputs_valid = all_inputs_valid && pdata->is_valid;
         // Short circuit OR operation
-        if(pdata->value && pdata->is_valid) { //if its valid, then its definitely true, if not it doesn't matter
-            //printf("%s\n", inputs->data);
-            output.value = TRUE;
-            output.is_valid = TRUE;//all_inputs_valid;
-            //printf("its true and its valid\n");
-            return output;
-        }
+        output_value = output_value | pdata->value;
         inputs = inputs->next;
     }
-    if (!all_inputs_valid) {
-        //printf("OR not valid\n");
-        return;
-    } 
 
-    output.value = FALSE;
-    output.is_valid = 1;
+
+    output.value = output_value;
+    output.is_valid = all_inputs_valid;
     
     return output;
 }
 
 // Returns the output of an XOR operation from a list of ports. Returns true if the number of TRUE values are odd.
 logic_return logical_XOR(linked_list inputs) {
+    bool all_inputs_valid = TRUE;
     bool return_value = FALSE;
     logic_return output;
 
@@ -156,18 +145,17 @@ logic_return logical_XOR(linked_list inputs) {
     while (inputs != NULL) {
         pdata_t pdata = (pdata_t)(((port_t) (inputs->data))->misc);
         // Input is invalid, exit immediatly
-        if (!pdata->is_valid) {
-            output.is_valid = FALSE;
-            return output;
-        }
+        all_inputs_valid = all_inputs_valid && pdata->is_valid;
         if (pdata->value) return_value = !return_value;
         inputs = inputs->next;
     }
 
     output.value = return_value;
-    output.is_valid = TRUE;
+    output.is_valid = all_inputs_valid;
     return output;
 }
+
+
 
 // Returns the output of an NAND operation from a list of ports.
 logic_return logical_NAND(linked_list inputs) {
@@ -314,6 +302,10 @@ void set_port(port_t p, bool val)
     //printf("updating port %s with value %01x\n", p->name, val);
     pdata_t pdata = ((pdata_t) (p->misc));
 
+    if(p->pt == PTYPE_EXT_IN) {
+        printf("port \n");
+    }
+
     // If this is already true, quit
     if (pdata->value == val && pdata->is_valid == TRUE) // Everything is already fine
         
@@ -382,12 +374,12 @@ void sim_run(const unsigned nsteps) {
    if (gates_delayed_processing==0) {
        int iii = 0 ;//printf("no gates to process\n");
    }
-   if (!seeFirst())
-        {
-            //printf("heap array is empty\n");
-            t = initial_t + nsteps;
-            return;
-        }
+//    if (!seeFirst())
+//         {
+//             //printf("heap array is empty\n");
+//             t = initial_t + nsteps;
+//             return;
+//         }
    unsigned int lastTime = seeFirst()->t;
    while (size!=0 && seeFirst() && seeFirst()->t <= initial_t+nsteps) {//while stuff to pop, pop it
         //printf("in sim_run while for time of %08x\n", seeFirst()->t);
