@@ -1,0 +1,123 @@
+digraph {
+ 	rankdir=LR;
+	node [shape=record];
+
+struct0[
+	label = "XOR|{{<mcc48f6b0>(no name)|<mcc48f6f0>(no name)}|<mcc48f730>(no name)}";
+];
+
+
+struct1[
+	label = "AND|{{<mcc48f770>(no name)|<mcc48f7b0>(no name)}|<mcc48f7f0>(no name)}";
+];
+
+
+struct2[
+	label = "XOR|{{<mcc48fa90>(no name)|<mcc48fad0>(no name)}|<mcc48fb10>(no name)}";
+];
+
+
+struct3[
+	label = "AND|{{<mcc48fb50>(no name)|<mcc48fb90>(no name)}|<mcc48fbd0>(no name)}";
+];
+
+
+struct4[
+	label = "OR|{{<mcc48f5b0>(_Cout1)|<mcc48f5f0>(_Cout2)}|<mcc48f630>(_Cout)}";
+];
+
+
+port1[
+	label="<mcc48e260>mcc48e260"
+	]
+
+port2[
+	label="<mcc48f2b0>mcc48f2b0"
+	]
+
+port3[
+	label="<mcc48f2f0>mcc48f2f0"
+	]
+
+port4[
+	label="<mcc48f330>mcc48f330"
+	]
+
+port5[
+	label="<mcc48f370>mcc48f370"
+	]
+
+port6[
+	label="<mcc48f3b0>(_HA1a)"
+	]
+
+port7[
+	label="<mcc48f3f0>(_HA1b)"
+	]
+
+port8[
+	label="<mcc48f430>(_HA1s)"
+	]
+
+port9[
+	label="<mcc48f470>(_HA1d)"
+	]
+
+port10[
+	label="<mcc48f4b0>(_HA2a)"
+	]
+
+port11[
+	label="<mcc48f4f0>(_HA2b)"
+	]
+
+port12[
+	label="<mcc48f530>(_HA2s)"
+	]
+
+port13[
+	label="<mcc48f570>(_HA2d)"
+	]
+
+
+	port1:mcc48e260->port6:mcc48f3b0;
+
+	port2:mcc48f2b0->port7:mcc48f3f0;
+
+	port6:mcc48f3b0->struct0:mcc48f6b0;
+
+	port6:mcc48f3b0->struct1:mcc48f770;
+
+	port7:mcc48f3f0->struct0:mcc48f6f0;
+
+	port7:mcc48f3f0->struct1:mcc48f7b0;
+
+	struct0:mcc48f730->port8:mcc48f430;
+
+	struct1:mcc48f7f0->port9:mcc48f470;
+
+	port8:mcc48f430->port10:mcc48f4b0;
+
+	port3:mcc48f2f0->port11:mcc48f4f0;
+
+	port10:mcc48f4b0->struct2:mcc48fa90;
+
+	port10:mcc48f4b0->struct3:mcc48fb50;
+
+	port11:mcc48f4f0->struct2:mcc48fad0;
+
+	port11:mcc48f4f0->struct3:mcc48fb90;
+
+	struct2:mcc48fb10->port12:mcc48f530;
+
+	struct3:mcc48fbd0->port13:mcc48f570;
+
+	port9:mcc48f470->struct4:mcc48f5b0;
+
+	port13:mcc48f570->struct4:mcc48f5f0;
+
+	port12:mcc48f530->port4:mcc48f330;
+
+	struct4:mcc48f630->port5:mcc48f370;
+
+}

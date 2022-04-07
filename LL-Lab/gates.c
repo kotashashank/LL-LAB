@@ -38,7 +38,8 @@ port_t port(const ptype_t pt, const char *name)
     void * misc = (void *) (misc_info);
     new_port->misc = misc; // Every port starts undefined 
 
-
+    printf("\ncreating port:\n");//below is address, (name)
+    printf("%08x,(%s)\n",new_port,new_port->name);
     return new_port;
 
 }
@@ -47,6 +48,17 @@ port_t port(const ptype_t pt, const char *name)
 // Adds ports to gate's input and outputs and and gates to port's gate linked list
 void gate(const op_t op, const port_t out, const unsigned num_in, ...)
 {
+    printf("\ncreating gate:\n");//string is creating gate then below
+    const char * these_enums[6] = {"NOT", "AND", "OR", "XOR", "NAND", "NOR"};
+    printf("%s,", these_enums[op]);
+    printf("%08x,",num_in);  //num_in, output_address ; [in_1][in_2]...
+    printf("%08x,",out);
+    if (out->name) {
+        printf("(%s);", out->name);
+    }
+    else {
+        printf("(no name);");
+    }
 
     // Make new gate, except for input ports
     gate_t new_gate = malloc(sizeof(struct gate));
@@ -60,6 +72,17 @@ void gate(const op_t op, const port_t out, const unsigned num_in, ...)
     // Iterate though list of inputs
     for (int i = 0; i < num_in; i++) {
         port_t current = va_arg(va, port_t);
+
+        printf("[");
+        printf("%08x", current);
+        printf(",");
+        if (current->name) {
+            printf("(%s)", current->name);
+        }
+        else {
+            printf("(no name)");
+        }
+        printf("]");
         
         // Create and add port node for gate's linked list
         linked_list newPortNode = malloc(sizeof(linked_list));
@@ -281,7 +304,9 @@ void process_gate(gate_t g) {
 void wire(const port_t src, const port_t dst)
 {
     pdata_t pdata = ((pdata_t) src->misc);
-
+    printf("\ncreating wire:\n");//from then to 
+    printf("%08x,(%s);",src, src->name);
+    printf("%08x,(%s)",dst, dst->name);
     // Add to front of linkedlist
     if (pdata->ports == 0) { // If there are no ports, create a list
         linked_list portList = malloc(sizeof(node));

@@ -4,6 +4,10 @@ from signal import signal
 from tkinter import *
 import re
 import time
+from draw_circuit import generate_base_graph, gate_prep
+sys.path.append("/u/ljv/.local/lib/python2.7/site-packages")#this is needed for my machine
+import graphviz
+
 WIDTH = 1000
 HEIGHT = 1000
 
@@ -67,6 +71,23 @@ def run():
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
     )
+    output = correct.stdout.splitlines()
+       
+    
+    #print(correct)
+    try:
+        gates, ports, wires = gate_prep(output)
+        base_src = generate_base_graph(ports, gates, wires)
+        print(base_src)
+        src = graphviz.Source(base_src)
+
+        #dot = graphviz.Digraph("round-table",comment="trial" )
+      
+        #doctest_mark_exe()
+        src.render("base_out")
+
+    except:
+        print("circuit generation failed for this - apologies prototype still in development")
     print(correct.stdout)
     return parse_data(correct.stdout)
     # print('outputed')
@@ -118,7 +139,7 @@ def create_signal_line(canvas, signals, x0, y0, graph_width, y_inc, fill, width)
 
 
 
-
+run()#delete later
 gui = create_window()
 canvas = create_canvas(gui)
 
