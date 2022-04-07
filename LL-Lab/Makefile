@@ -13,5 +13,8 @@ runner: gates.o priorityqueue.o fulladder.c
 runner2: gates.o priorityqueue.o fulladder.c
 	$(CC) $(CFLAGS) -o runner2 fulladder2.c  gates.o priorityqueue.o 
 
+clock: gates.o priorityqueue.o testclock.c
+	$(CC) $(CFLAGS) -o clock testclock.c  gates.o priorityqueue.o 
+
 clean:
-	rm -f *.o runner r2 
+	rm -f *.o runner r  clock

@@ -39,11 +39,11 @@ int main(void) {
 
 
     sim_init();
+        port_t D = port(PTYPE_EXT_OUT, NULL);
     port_t A = port(PTYPE_EXT_IN, NULL);
     port_t B = port(PTYPE_EXT_IN, NULL);
     port_t C = port(PTYPE_EXT_IN, NULL);
     port_t S = port(PTYPE_EXT_OUT, NULL);
-    port_t D = port(PTYPE_EXT_OUT, NULL);
     delay = 2;
     fulladder(A, B, C, S, D);
     unsigned t = get_sim_time();

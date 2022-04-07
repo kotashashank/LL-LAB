@@ -42,9 +42,7 @@ def parse_data(output):
         i += 1
             
     print(signals_array[4])
-    return (signals_array, input_amount)
-
-    
+    return (signals_array, times_array, input_amount)
 
     
 
@@ -127,13 +125,34 @@ canvas = create_canvas(gui)
 
 
 
-def create_signals(signals_array, input_amount, graph_height, graph_width, graph_x, init_y):
+
+
+
+def create_signals(signals_array, time_array, input_amount, graph_height, graph_width, x0, y0, fillIn, fillOut, width, step):
     signal_height = graph_height / len(signals_array)
-    current_y = init_y
-    for i in range(0, len(signals_array)):
-        create_signal_line(canvas, signals_array[i], graph_x, current_y, graph_width, graph_height / len(signals_array) - 20, 'green' if i < input_amount else 'red', 4)
-        current_y += signal_height
+    signal_width = graph_width / len(time_array)
+    current_x = x0
+    y_inc = graph_height / len(signals_array) - 20
+    for t in range(0, len(time_array)):
+        for i in range(0, len(signals_array)):
+            fill = fillIn if i < input_amount else fillOut
+            current_y = y0 + i * signal_height
+            
+            if(not signals_array[i][t]):
+                canvas.create_line(current_x, current_y + y_inc, current_x + signal_width, current_y + y_inc, fill=fill, width=width)
+            else:
+                canvas.create_line(current_x, current_y, current_x + signal_width, current_y, fill=fill, width=width)
+
+            if(t + 1 < len(time_array) and signals_array[i][t] != signals_array[i][t + 1]):
+                if(not signals_array[i][t]):
+                     canvas.create_line(current_x + signal_width, current_y, current_x + signal_width, current_y + y_inc, fill=fill, width=width)
+                else:
+                    canvas.create_line(current_x + signal_width, current_y + y_inc, current_x + signal_width, current_y, fill=fill, width=width)
+
         gui.update()
+        time.sleep(step)
+        current_x += signal_width
+    
 
 
 
@@ -144,7 +163,7 @@ canvas.create_line(100, 750, 900, 750, fill='black', width=5)
 c_output = run() # 0 -> signal array | #1 -> input amount
 
 
-create_signals(c_output[0], c_output[1], 650, 800, 100, 100)
+create_signals(c_output[0], c_output[1], c_output[2], 650, 800, 100, 100, fillIn='green', fillOut='red', width=4, step=0.015)
 
 canvas.create_line(100, 750, 100, 100, fill='black', width=5)
 canvas.create_line(100, 750, 900, 750, fill='black', width=5)
