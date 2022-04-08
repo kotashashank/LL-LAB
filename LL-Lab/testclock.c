@@ -15,9 +15,9 @@ int main(void) {
 
    port_t C = port(PTYPE_OUT, "Value of A");
 
+   delay = 2;
    gate(OP_AND, C, 2, A, B);
 
-   delay = 2;
     
     
    unsigned t = get_sim_time();

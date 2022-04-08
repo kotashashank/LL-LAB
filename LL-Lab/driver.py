@@ -6,10 +6,26 @@ import re
 import time
 from draw_circuit import generate_base_graph, gate_prep
 sys.path.append("/u/ljv/.local/lib/python2.7/site-packages")#this is needed for my machine
-import graphviz
 
-WIDTH = 1000
-HEIGHT = 1000
+# CHANGE THIS
+makefile = "runner"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def parse_data(output):
@@ -65,8 +81,10 @@ def get_ports(output_array):
     
 
 def run():
+    subprocess.run(
+        ["make", "clean", makefile, "GUI='-DLGUI'"])
     correct = subprocess.run(
-        ["./runner2"],
+        [("./" + makefile)],
         universal_newlines=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
@@ -89,6 +107,19 @@ def run():
     except:
         print("circuit generation failed for this - apologies prototype still in development")
     print(correct.stdout)
+
+
+
+    subprocess.run(
+        ["make", "clean", makefile, "GUI='-DGUI'"])
+    correct = subprocess.run(
+        [("./" + makefile)],
+        universal_newlines=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+
+    
     return parse_data(correct.stdout)
     # print('outputed')
 
@@ -154,6 +185,9 @@ def create_signals(signals_array, time_array, input_amount, graph_height, graph_
     current_x = x0
     y_inc = graph_height / len(signals_array) - 20
     for t in range(0, len(time_array)):
+        canvas.create_rectangle(graph_height + x0 + 152, y0 + graph_height - 50, graph_height +x0 + 1000, y0 + graph_height + 50, fill='white')
+        canvas.create_text(graph_width + x0 + 50, y0 + graph_height, text=time_array[t], fill='grey', font="Helvetica 50 bold")
+        
         for i in range(0, len(signals_array)):
             fill = fillIn if i < input_amount else fillOut
             current_y = y0 + i * signal_height
@@ -165,7 +199,7 @@ def create_signals(signals_array, time_array, input_amount, graph_height, graph_
 
             if(t + 1 < len(time_array) and signals_array[i][t] != signals_array[i][t + 1]):
                 if(not signals_array[i][t]):
-                     canvas.create_line(current_x + signal_width, current_y, current_x + signal_width, current_y + y_inc, fill=fill, width=width)
+                    canvas.create_line(current_x + signal_width, current_y, current_x + signal_width, current_y + y_inc, fill=fill, width=width)
                 else:
                     canvas.create_line(current_x + signal_width, current_y + y_inc, current_x + signal_width, current_y, fill=fill, width=width)
 
@@ -190,7 +224,7 @@ canvas.create_line(100, 750, 900, 750, fill='black', width=5)
 c_output = run() # 0 -> signal array | #1 -> input amount
 create_ticks(c_output[1], 100, 750, 800)
 
-create_signals(c_output[0], c_output[1], c_output[2], 650, 800, 100, 100, fillIn='green', fillOut='red', width=4, step=0.015)
+create_signals(c_output[0], c_output[1], c_output[2], 650, 800, 100, 100, fillIn='green', fillOut='red', width=4, step=0.01)
 
 canvas.create_line(100, 750, 100, 100, fill='black', width=5)
 canvas.create_line(100, 750, 900, 750, fill='black', width=5)

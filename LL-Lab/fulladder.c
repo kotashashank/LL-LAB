@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include "gates.h"
 #include "priorityqueue.h"
-
-
 void fulladder(port_t ain, port_t bin, port_t cin, port_t sum, port_t cout) {
     assert(PTYPE_EXT_IN == ain->pt);
     assert(PTYPE_EXT_IN == bin->pt);
@@ -26,24 +24,22 @@ void fulladder(port_t ain, port_t bin, port_t cin, port_t sum, port_t cout) {
     port_t Cout2 = port(PTYPE_IN, "_Cout2");
     port_t Cout = port(PTYPE_OUT, "_Cout");
     
-
-        
-    wire(ain, HA1a); wire(bin, HA1b);
-    wire(HA1s, HA2a); wire(cin, HA2b);
-    wire(HA1d, Cout1); wire(HA2d, Cout2);
-    wire(HA2s, sum); wire(Cout, cout);
-
     gate(OP_XOR, HA1s, 2, HA1a, HA1b); gate(OP_AND, HA1d, 2, HA1a, HA1b);
     gate(OP_XOR, HA2s, 2, HA2a, HA2b); gate(OP_AND, HA2d, 2, HA2a, HA2b);
     gate(OP_OR, Cout, 2, Cout1, Cout2);
 
+    
+    wire(ain, HA1a); wire(bin, HA1b);
+    wire(HA1s, HA2a); wire(cin, HA2b);
+    wire(HA1d, Cout1); wire(HA2d, Cout2);
+    wire(HA2s, sum); wire(Cout, cout);
 }
 
 int main(void) {
 
 
     sim_init();
-    port_t D = port(PTYPE_EXT_OUT, NULL);
+        port_t D = port(PTYPE_EXT_OUT, NULL);
     port_t A = port(PTYPE_EXT_IN, NULL);
     port_t B = port(PTYPE_EXT_IN, NULL);
     port_t C = port(PTYPE_EXT_IN, NULL);
@@ -64,7 +60,6 @@ int main(void) {
                     sim_run(2); t++; t++;
                     assert(get_sim_time() == t);
                 }
-                printf("\n");
             }
         }
     }

@@ -3,13 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "gates.h"
-
 void halfadder(port_t ain, port_t bin, port_t sum, port_t cout) {
     // assert(PTYPE_EXT_IN == ain->pt);
     // assert(PTYPE_EXT_IN == bin->pt);
     // assert(PTYPE_EXT_OUT == sum->pt);
     // assert(PTYPE_EXT_OUT == cout->pt);
-
     port_t XORia = port(PTYPE_IN, NULL),
            XORib = port(PTYPE_IN, NULL),
            XORo = port(PTYPE_OUT, NULL),
@@ -20,18 +18,15 @@ void halfadder(port_t ain, port_t bin, port_t sum, port_t cout) {
     wire(ain, XORia); wire(ain, ANDia);
     wire(bin, XORib); wire(bin, ANDib);
     wire(XORo, sum); wire(ANDo, cout);
-
     gate(OP_XOR, XORo, 2, XORia, XORib);
     gate(OP_AND, ANDo, 2, ANDia, ANDib);
 }
-
 void fulladder(port_t ain, port_t bin, port_t cin, port_t sum, port_t cout) {
     assert(PTYPE_EXT_IN == ain->pt);
     assert(PTYPE_EXT_IN == bin->pt);
     assert(PTYPE_EXT_IN == cin->pt);
     assert(PTYPE_EXT_OUT == sum->pt);
     assert(PTYPE_EXT_OUT == cout->pt);
-
     port_t HA1a = port(PTYPE_IN, "_HA1a");
     port_t HA1b = port(PTYPE_IN, "_HA1b");
     port_t HA1s = port(PTYPE_OUT, "_HA1s");
@@ -52,16 +47,13 @@ void fulladder(port_t ain, port_t bin, port_t cin, port_t sum, port_t cout) {
     gate(OP_OR, Cout, 2, Cout1, Cout2);
     wire(HA2s, sum); wire(Cout, cout);
 }
-
 int main(void) {
     sim_init();
-
     port_t A = port(PTYPE_EXT_IN, NULL);
     port_t B = port(PTYPE_EXT_IN, NULL);
     port_t C = port(PTYPE_EXT_IN, NULL);
     port_t S = port(PTYPE_EXT_OUT, NULL);
     port_t D = port(PTYPE_EXT_OUT, NULL);
-
     delay = 2;
     fulladder(A, B, C, S, D);
     unsigned t = get_sim_time();
@@ -77,7 +69,6 @@ int main(void) {
                     sim_run(1); t++;
                     assert(get_sim_time() == t);
                 }
-                printf("\n");
             }
         }
     }

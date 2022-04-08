@@ -39,8 +39,12 @@ port_t port(const ptype_t pt, const char *name)
     new_port->misc = misc; // Every port starts undefined 
 
     //printf("port added of type %i and of name %s\n", new_port->pt, new_port->name);
-    printf("\ncreating port:\n");//below is address, (name)
-    printf("%08x,(%s)\n",new_port,new_port->name);
+    
+    #ifdef LGUI
+        printf("\ncreating port:\n");//below is address, (name)
+        printf("%08x,(%s)\n",new_port,new_port->name);
+    #endif
+
     return new_port;
 
 }
@@ -50,17 +54,19 @@ port_t port(const ptype_t pt, const char *name)
 void gate(const op_t op, const port_t out, const unsigned num_in, ...)
 {
 
-    printf("\ncreating gate:\n");//string is creating gate then below
-    const char * these_enums[6] = {"NOT", "AND", "OR", "XOR", "NAND", "NOR"};
-    printf("%s,", these_enums[op]);
-    printf("%08x,",num_in);  //num_in, output_address ; [in_1][in_2]...
-    printf("%08x,",out);
-    if (out->name) {
-        printf("(%s);", out->name);
-    }
-    else {
-        printf("(no name);");
-    }
+    #ifdef LGUI
+        printf("\ncreating gate:\n");//string is creating gate then below
+        const char * these_enums[6] = {"NOT", "AND", "OR", "XOR", "NAND", "NOR"};
+        printf("%s,", these_enums[op]);
+        printf("%08x,",num_in);  //num_in, output_address ; [in_1][in_2]...
+        printf("%08x,",out);
+        if (out->name) {
+            printf("(%s);", out->name);
+        }
+        else {
+            printf("(no name);");
+        }
+    #endif
 
     // Make new gate, except for input ports
     gate_t new_gate = malloc(sizeof(struct gate));
@@ -75,16 +81,18 @@ void gate(const op_t op, const port_t out, const unsigned num_in, ...)
     for (int i = 0; i < num_in; i++) {
         port_t current = va_arg(va, port_t);
         
-        printf("[");
-        printf("%08x", current);
-        printf(",");
-        if (current->name) {
-            printf("(%s)", current->name);
-        }
-        else {
-            printf("(no name)");
-        }
-        printf("]");
+        #ifdef LGUI
+            printf("[");
+            printf("%08x", current);
+            printf(",");
+            if (current->name) {
+                printf("(%s)", current->name);
+            }
+            else {
+                printf("(no name)");
+            }
+            printf("]");
+        #endif
 
         // Create and add port node for gate's linked list
         linked_list newPortNode = malloc(sizeof(linked_list));
@@ -297,9 +305,11 @@ void process_gate(gate_t g) {
 void wire(const port_t src, const port_t dst)
 {
     pdata_t pdata = ((pdata_t) src->misc);
-    printf("\ncreating wire:\n");//from then to
-    printf("%08x,(%s);",src, src->name);
-    printf("%08x,(%s)",dst, dst->name);
+    #ifdef LGUI
+        printf("\ncreating wire:\n");//from then to
+        printf("%08x,(%s);",src, src->name);
+        printf("%08x,(%s)",dst, dst->name);
+    #endif
 
     // Add to front of linkedlist
     if (pdata->ports == 0) { // If there are no ports, create a list
