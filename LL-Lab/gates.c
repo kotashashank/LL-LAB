@@ -36,14 +36,13 @@ port_t port(const ptype_t pt, const char *name)
 
     // Add port to port struct
     void * misc = (void *) (misc_info);
-    new_port->misc = misc; // Every port starts undefined 
+    new_port->misc = misc; // Every port starts undefined
 
     printf("\ncreating port:\n");//below is address, (name)
     printf("%08x,(%s)\n",new_port,new_port->name);
     return new_port;
 
 }
-
 
 // Adds ports to gate's input and outputs and and gates to port's gate linked list
 void gate(const op_t op, const port_t out, const unsigned num_in, ...)
@@ -65,7 +64,7 @@ void gate(const op_t op, const port_t out, const unsigned num_in, ...)
     new_gate->op = op;
     new_gate->port_output = out;
     new_gate->delay = delay;
-    
+
     va_list va;
     va_start(va, num_in);
 
@@ -83,7 +82,7 @@ void gate(const op_t op, const port_t out, const unsigned num_in, ...)
             printf("(no name)");
         }
         printf("]");
-        
+
         // Create and add port node for gate's linked list
         linked_list newPortNode = malloc(sizeof(linked_list));
         newPortNode->data = current;
@@ -109,28 +108,28 @@ void gate(const op_t op, const port_t out, const unsigned num_in, ...)
     // printf("\n");
 
     va_end(va);
-    
+
 }
 
 // Returns the output of an AND operation from a list of ports
 logic_return logical_AND(linked_list inputs) {
     bool all_inputs_valid = TRUE;
     logic_return output;
-    
+
     // Iterate through each input
     while (inputs != NULL) {
         pdata_t pdata = (pdata_t)(((port_t) (inputs->data))->misc);
 
         all_inputs_valid = all_inputs_valid && pdata->is_valid;
         // Short circuit AND operation
-        if(!pdata->value && pdata->is_valid) { 
+        if(!pdata->value && pdata->is_valid) {
             output.value = FALSE;
             output.is_valid = TRUE;// all_inputs_valid;
             return output;
         }
         inputs = inputs->next;
     }
-    
+
     output.value = TRUE;
     output.is_valid = all_inputs_valid;
     return output;
@@ -138,7 +137,7 @@ logic_return logical_AND(linked_list inputs) {
 
 // Returns the output of an OR operation from a list of ports
 logic_return logical_OR(linked_list inputs) {
-    
+
     bool all_inputs_valid = TRUE;
     logic_return output;
 
@@ -160,11 +159,11 @@ logic_return logical_OR(linked_list inputs) {
     if (!all_inputs_valid) {
         //printf("OR not valid\n");
         return output;
-    } 
+    }
 
     output.value = FALSE;
     output.is_valid = 1;
-    
+
     return output;
 }
 
@@ -214,9 +213,8 @@ logic_return logical_NOT(linked_list inputs) {
     output.is_valid = input_data->is_valid;
 }
 
-
 // Add to list to process after current timestamp
-void delayed_process_gate(gate_t g) { 
+void delayed_process_gate(gate_t g) {
 
     if (!gates_delayed_processing) {
         linked_list startNode = malloc(sizeof(node));
@@ -231,7 +229,6 @@ void delayed_process_gate(gate_t g) {
         if ((gate_t)current_place->data == g) return;
         current_place = current_place->next;
     }
-    
 
     // We've reached end and nothing there
     linked_list newGate = malloc(sizeof(node));
@@ -299,18 +296,17 @@ void process_gate(gate_t g) {
     //printArray(heap_array, size);
 };
 
-
 //init wire
 void wire(const port_t src, const port_t dst)
 {
     pdata_t pdata = ((pdata_t) src->misc);
-    printf("\ncreating wire:\n");//from then to 
+    printf("\ncreating wire:\n");//from then to
     printf("%08x,(%s);",src, src->name);
     printf("%08x,(%s)",dst, dst->name);
     // Add to front of linkedlist
     if (pdata->ports == 0) { // If there are no ports, create a list
         linked_list portList = malloc(sizeof(node));
-        portList->next = 0; 
+        portList->next = 0;
         portList->data = (void *)(dst);
         pdata->ports = portList;
         return;
@@ -321,7 +317,6 @@ void wire(const port_t src, const port_t dst)
     newData->data = (void *)(dst);
     newData->next = next;
     pdata->ports = newData;
-    
 
 }
 
@@ -329,6 +324,34 @@ void wire(const port_t src, const port_t dst)
 // A timestep is of an arbitrary and unspecified number of seconds.
 port_t clock(const unsigned hi, const unsigned lo)
 {
+
+    port_t toRet = malloc(sizeof(struct port));
+    toRet->name = "clock";
+    toRet->pt = PTYPE_CLK;
+    pdata_t misc = malloc(sizeof(struct port_data ));
+    misc->value = FALSE;
+    misc->is_valid = TRUE;
+    misc->gates = NULL;
+    misc->ports = NULL;
+
+    clock_data_t clock_info = malloc(sizeof(struct clock_data));
+    clock_info->time_high = hi;
+    clock_info->time_low = lo;
+
+    misc->clock_data = clock_info;
+
+    toRet->misc = (void *)(misc);
+
+    node_t node = malloc(sizeof(struct pq_node));
+    node->port = toRet;
+    node->new_value = 1;
+    clock_data_t clock_information = ((pdata_t)(node->port->misc))->clock_data;
+    node->t = t + clock_information->time_low;
+    insert(heap_array, node);
+    printf("\ncreating port:\n");//below is address, (name)
+    printf("%08x,(%s)\n",toRet,toRet->name);
+    return toRet;
+
     // TODO
 }
 
@@ -343,13 +366,11 @@ void set_port(port_t p, bool val)
 
     // If this is already true, quit
     if (pdata->value == val && pdata->is_valid == TRUE) // Everything is already fine
-        
-        
+
         {
             //printf("nothing changing with port %s\n", p->name);
             return;
         }
-            
 
     // Its being set so now valid
     pdata->value = val;
@@ -365,7 +386,7 @@ void set_port(port_t p, bool val)
         //port_t children_port
         port_children = port_children->next;
     }
-    
+
     linked_list theGates = pdata->gates;
 
     //gate_t * theGate = &pdata->nextGate;
@@ -403,11 +424,8 @@ void sim_run(const unsigned nsteps) {
    //t = t + nsteps;
    int initial_t = t;
    if (gates_delayed_processing!=0) {//if gates left to process process then run again
-   
+
        process_delayed_gates();
-   }
-   if (gates_delayed_processing==0) {
-       int iii = 0 ;//printf("no gates to process\n");
    }
    if (!seeFirst())
         {
@@ -425,17 +443,30 @@ void sim_run(const unsigned nsteps) {
        //printf("processing port\n");
        node_t node_pointer = seeFirst();
        deleteRoot(heap_array);
-       set_port(node_pointer->port, node_pointer->new_value);
+       if (node_pointer->port->pt == PTYPE_CLK) {
+           int time_delay;
+           if (((pdata_t)(node_pointer->port->misc))->value == 1)//bc its about to change reverse
+                time_delay = ((clock_data_t)((pdata_t)node_pointer->port->misc)->clock_data)->time_low;
+            else
+                time_delay = ((clock_data_t)((pdata_t)node_pointer->port->misc)->clock_data)->time_high;
+           time_delay+= t;//add current time for when making the node
 
+           node_t node = malloc(sizeof(struct pq_node));
+           node->port = node_pointer->port;
+           node->new_value = !(((pdata_t)(node_pointer->port->misc))->value);
+           node->t = time_delay;
+           insert(heap_array, node);
+
+       }
+       set_port(node_pointer->port, node_pointer->new_value);
 
        if (seeFirst())
          t = min(initial_t + nsteps, seeFirst()->t);
-       else 
+       else
          {
              t = initial_t + nsteps;
          }
-        
-    
+
    }
    if (gates_delayed_processing!=0) {//if gates left to process process then run again
        //printf("processing gates\n");
@@ -444,5 +475,5 @@ void sim_run(const unsigned nsteps) {
    }
 
     t = initial_t + nsteps;
-   
+
 }

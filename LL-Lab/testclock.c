@@ -10,10 +10,10 @@ int main(void) {
 
    port_t A = clock(9, 3);
    
-   port_t B = port(PTYPE_EXT_IN, "Constant Port");
+   port_t B = port(PTYPE_IN, "Constant Port");
    set_port(B, 1);
 
-   port_t C = port(PTYPE_EXT_OUT, "Value of A");
+   port_t C = port(PTYPE_OUT, "Value of A");
 
    gate(OP_AND, C, 2, A, B);
 

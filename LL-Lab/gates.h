@@ -14,7 +14,6 @@
 extern unsigned delay;
 extern unsigned t;
 
-
 // The different kinds of ports.
 typedef enum ptype {
     PTYPE_IN,
@@ -25,12 +24,10 @@ typedef enum ptype {
     PTYPE_ERR = -1
 } ptype_t;
 
-
 typedef struct linked_list_node {
     void * data;
     struct linked_list_node *next;
 } node, *linked_list;
-
 
 extern void freeLL(linked_list node );
 
@@ -60,13 +57,19 @@ typedef struct gate {
     int delay;
 } *gate_t;
 
+typedef struct clock_data {
+    int time_high;
+    int time_low;
+} *clock_data_t;
+
 typedef struct port_data {
     bool value;
     bool is_valid;
     linked_list gates;
     //gate_t nextGate;//null if no gate
     linked_list ports;
-    //port_t ports[]; 
+    clock_data_t * clock_data;
+    //port_t ports[];
 } *pdata_t;
 
 typedef struct return_from_logic {
@@ -93,4 +96,4 @@ extern void sim_init(void);
 extern void sim_run(const unsigned nsteps);
 extern void sim_exit(void);
 
-#endif 
+#endif
