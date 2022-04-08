@@ -8,7 +8,7 @@ from draw_circuit import generate_base_graph, gate_prep
 sys.path.append("/u/ljv/.local/lib/python2.7/site-packages")#this is needed for my machine
 
 # CHANGE THIS
-makefile = "runner"
+makefile = "runner2"
 
 
 
@@ -119,7 +119,7 @@ def run():
         stderr=subprocess.PIPE
     )
 
-    
+
     return parse_data(correct.stdout)
     # print('outputed')
 

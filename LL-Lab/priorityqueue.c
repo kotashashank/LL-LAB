@@ -45,54 +45,14 @@ void heapify(node_t array[], int size, int i) {
   }
 }
 
-struct pq_node  * seeFirst() {
+struct pq_node* seeFirst() {
 
    //return (pq_global_ll->node);
   return heap_array[0];
 }
 
-void assert_low_priority() {
-   struct pq_linked_list * current = pq_global_ll;
-   struct pq_linked_list * prev = 0;
-   while (current && current->next && current->node->t > current->next->node->t) {
-      struct pq_linked_list * hold = current->next->next;
-      if (prev) {
-      
-        prev->next = current->next;//set prev to next to be one over
-        current->next->next = current; //se 1 over to point to current
-        prev = current;//set previous to be current value
-        current->next = hold;//set current to point 2 after
-      }
-      else {
-         pq_global_ll = current->next; 
-         current->next->next = current;
-         prev = current;//set previous to be current value
-         current->next = hold;
-      }
-      current = current->next;
-   }
-
-}
 // Function to insert an element into the tree
 void insert(node_t array[], node_t new_port) {
-
-  /*
-  ll newLL = malloc(sizeof(struct pq_linked_list));//using linked list priority queue instead so can test everything else
-  newLL->node = new_port;
-  if (pq_global_ll==0) {
-    
-    newLL->next = 0;
-    
-  }
-  else {
-    newLL->next = pq_global_ll;
-  }
-  pq_global_ll = newLL; 
-  assert_low_priority();
-  return;*/
-  /*node_t new_node = malloc(sizeof(node_t));
-  new_node->port = new_port;
-  new_node->t = t;*/
 
   node_t new_node = new_port;
 
@@ -110,21 +70,6 @@ void insert(node_t array[], node_t new_port) {
 
 // Function to delete an element from the tree
 void deleteRoot(node_t array[]) {
-
-  /*
-  if (pq_global_ll) {
-    ll prev = pq_global_ll;
-    pq_global_ll = pq_global_ll->next;
-    free(prev);
-    return;
-  }
-  else {
-    assert(0);
-    return;
-  }*/
-
-
-
 
   int i;
   for (i = 0; i < size; i++) {
@@ -148,32 +93,3 @@ void printArray(node_t array[], int size) {
     }
   printf("\n");
 }
-
-// testing code
-/*int main() {
-  
-  
-
-  port_t HA1a = port(PTYPE_IN, "t0");
-
-  port_t HA1b = port(PTYPE_IN, "t2");
-
-  port_t HA1c = port(PTYPE_IN, "t4");
-
-  insert(heap_array, HA1a);
-  t = 2;
-  insert(heap_array, HA1b);
-  t = 4;
-  insert(heap_array, HA1c);
-
-  printf("Max-Heap array: ");
-  printArray(heap_array, size);
-
-  deleteRoot(heap_array);
-  printf("After deleting an element: ");
-
-  printArray(heap_array, size);
-
-}
-
-*/

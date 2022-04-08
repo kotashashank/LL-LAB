@@ -39,7 +39,7 @@ int main(void) {
 
 
     sim_init();
-        port_t D = port(PTYPE_EXT_OUT, NULL);
+    port_t D = port(PTYPE_EXT_OUT, NULL);
     port_t A = port(PTYPE_EXT_IN, NULL);
     port_t B = port(PTYPE_EXT_IN, NULL);
     port_t C = port(PTYPE_EXT_IN, NULL);

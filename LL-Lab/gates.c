@@ -37,12 +37,9 @@ port_t port(const ptype_t pt, const char *name)
     // Add port to port struct
     void * misc = (void *) (misc_info);
     new_port->misc = misc; // Every port starts undefined 
-
-    //printf("port added of type %i and of name %s\n", new_port->pt, new_port->name);
     
     #ifdef LGUI
-        printf("\ncreating port:\n");//below is address, (name)
-        printf("%08x,(%s)\n",new_port,new_port->name);
+        printf("\ncreating port:\n"); printf("%08x,(%s)\n", new_port, new_port->name); 
     #endif
 
     return new_port;
@@ -53,19 +50,14 @@ port_t port(const ptype_t pt, const char *name)
 // Adds ports to gate's input and outputs and and gates to port's gate linked list
 void gate(const op_t op, const port_t out, const unsigned num_in, ...)
 {
-
     #ifdef LGUI
-        printf("\ncreating gate:\n");//string is creating gate then below
+        printf("\ncreating gate:\n");
         const char * these_enums[6] = {"NOT", "AND", "OR", "XOR", "NAND", "NOR"};
         printf("%s,", these_enums[op]);
-        printf("%08x,",num_in);  //num_in, output_address ; [in_1][in_2]...
+        printf("%08x,",num_in);  
         printf("%08x,",out);
-        if (out->name) {
-            printf("(%s);", out->name);
-        }
-        else {
-            printf("(no name);");
-        }
+        if (out->name) printf("(%s);", out->name);
+        else printf("(no name);");
     #endif
 
     // Make new gate, except for input ports
@@ -82,15 +74,9 @@ void gate(const op_t op, const port_t out, const unsigned num_in, ...)
         port_t current = va_arg(va, port_t);
         
         #ifdef LGUI
-            printf("[");
-            printf("%08x", current);
-            printf(",");
-            if (current->name) {
-                printf("(%s)", current->name);
-            }
-            else {
-                printf("(no name)");
-            }
+            printf("[%08x,", current);
+            if (current->name) printf("(%s)", current->name);
+            else printf("(no name)");
             printf("]");
         #endif
 
@@ -106,18 +92,7 @@ void gate(const op_t op, const port_t out, const unsigned num_in, ...)
         newGateNode->next = ((pdata_t) current->misc)->gates;
         ((pdata_t) current->misc)->gates = newGateNode;
 
-       // printf("adding port %d: port %s to this gate\n", i, current->name);
     }
-
-    // Debugging code
-    // linked_list currentPort = new_gate->port_inputs;
-    // printf("ports in gate: ");
-    // while(currentPort != NULL)
-    // {
-    //     printf("%s, ", ((port_t) currentPort->data)->name);
-    //     currentPort = currentPort->next;
-    // }
-    // printf("\n");
 
     va_end(va);
     
@@ -150,6 +125,7 @@ logic_return logical_OR(linked_list inputs) {
     bool all_inputs_valid = TRUE;
     logic_return output;
     bool output_value = FALSE;
+
     // Iterate through each input
     while (inputs != NULL) {
         pdata_t pdata = (pdata_t)(((port_t) (inputs->data))->misc);
@@ -260,7 +236,6 @@ void process_delayed_gates() {
 // Apply operations to gate inputs and change output
 void process_gate(gate_t g) {
 
-    //printf("at time %08x, processing gate of value %02x\n", t, g->op);
     op_t op = g->op;
     logic_return output;
 
@@ -275,17 +250,11 @@ void process_gate(gate_t g) {
         case OP_ERROR: printf("Error in gates.c\n"); assert(0);
     }
 
-    if (!output.is_valid) {
-        //printf("Output is invalid\n");
-        return;
-    }
+    if (!output.is_valid) return;
 
-    //printf("output is valid\n");
-
-    // Note: ?
-    if (output.value == ((pdata_t)g->port_output->misc)->value) { //and statement on two lines
+    if (output.value == ((pdata_t)g->port_output->misc)->value) { 
         bool is_valid = ((pdata_t)(g->port_output->misc))->is_valid;
-        if (is_valid) return; //value is always valid and not changing
+        if (is_valid) return; 
     }
 
     // Add output to priorty queue
@@ -293,26 +262,25 @@ void process_gate(gate_t g) {
     node->port = g->port_output;
     node->new_value = output.value;
     node->t = t + g->delay;
-    //printf("adding node to priority queue with time of %08x\n", node->t);
-    //printArray(heap_array, size);
-    assert(node!=0);
+
+    assert(node != NULL);
     insert(heap_array, node);
-    //printArray(heap_array, size);
 };
 
 
-//init wire
+// Initlizes wire 
 void wire(const port_t src, const port_t dst)
 {
     pdata_t pdata = ((pdata_t) src->misc);
+
     #ifdef LGUI
-        printf("\ncreating wire:\n");//from then to
+        printf("\ncreating wire:\n");
         printf("%08x,(%s);",src, src->name);
         printf("%08x,(%s)",dst, dst->name);
     #endif
 
     // Add to front of linkedlist
-    if (pdata->ports == 0) { // If there are no ports, create a list
+    if (pdata->ports == NULL) { // If there are no ports, create a list
         linked_list portList = malloc(sizeof(node));
         portList->next = 0; 
         portList->data = (void *)(dst);
@@ -331,14 +299,14 @@ void wire(const port_t src, const port_t dst)
 
 // The remaining routines allow a test routine to simulate a given circuit for a number of timesteps.
 // A timestep is of an arbitrary and unspecified number of seconds.
-
 port_t clock(const unsigned hi, const unsigned lo)
 {
 
-    port_t toRet = malloc(sizeof(struct port));
-    toRet->name = "clock";
-    toRet->pt = PTYPE_CLK;
-    pdata_t misc = malloc(sizeof(struct port_data ));
+    port_t return_port = malloc(sizeof(struct port));
+    return_port->name = "clock";
+    return_port->pt = PTYPE_CLK;
+    pdata_t misc = malloc(sizeof(struct port_data));
+
     misc->value = FALSE;
     misc->is_valid = TRUE;
     misc->gates = NULL;
@@ -350,129 +318,121 @@ port_t clock(const unsigned hi, const unsigned lo)
 
     misc->clock_data = clock_info;
 
-    toRet->misc = (void *)(misc);
+    return_port->misc = (void *)(misc);
 
     node_t node = malloc(sizeof(struct pq_node));
-    node->port = toRet;
-    node->new_value = 1;
+    node->port = return_port;
+    node->new_value = TRUE;
+
     clock_data_t clock_information = ((pdata_t)(node->port->misc))->clock_data;
     node->t = t + clock_information->time_low;
-    insert(heap_array, node);
-    printf("\ncreating port:\n");//below is address, (name)
-    printf("%08x,(%s)\n",toRet,toRet->name);
-    return toRet;
 
-    // TODO
+    insert(heap_array, node);
+
+    #ifdef LGUI
+        printf("\ncreating port:\n"); printf("%08x,(%s)\n",return_port,return_port->name);
+    #endif
+
+    return return_port;
 }
 
 
 void set_port(port_t p, bool val)
 {
-    //printf("updating port %s with value %01x\n", p->name, val);
     pdata_t pdata = ((pdata_t) (p->misc));
 
     #ifdef GUI
-        if(p->pt == PTYPE_EXT_IN) {
-            printf("port \n");
-        }
+        if(p->pt == PTYPE_EXT_IN) printf("port \n");
     #endif
 
-    // If this is already true, quit
-    if (pdata->value == val && pdata->is_valid == TRUE) // Everything is already fine
-        {
-            //printf("nothing changing with port %s\n", p->name);
-            return;
-        }
+    if (pdata->value == val && pdata->is_valid == TRUE) return;
+        
             
 
-    // Its being set so now valid
+    // Make port valid because it is being set
     pdata->value = val;
     pdata->is_valid = TRUE;
 
-    // Need to push children/gates/ports that are needed
+    // Push children/gates/ports that are needed
     linked_list port_children = pdata->ports;
-    while (port_children) {
+    while (port_children != NULL) {
         port_t current_port = (port_t)(port_children->data);
-        //its directly connected so need to set this port too
-        set_port(current_port, val);
 
-        //port_t children_port
+        // Set dirrectly connected ports
+        set_port(current_port, val);
+        
         port_children = port_children->next;
     }
     
-    linked_list theGates = pdata->gates;
 
-    //gate_t * theGate = &pdata->nextGate;
-    while (theGates) { // There is a gate we need to process
-        // TIME COMPLEXITY REDUCTION: wait until finished with all setting values before doing this
-        gate_t theGate = (gate_t)theGates->data;
-        delayed_process_gate(theGate);//push to process after done w/ all of current time stamp
+    // Process any gate connected to set port
+    linked_list connected_gates = pdata->gates;
+    while (connected_gates != NULL) { 
+        gate_t connected_gate = (gate_t)connected_gates->data;
+        delayed_process_gate(connected_gate);
 
-        theGates = theGates->next;
+        connected_gates = connected_gates->next;
     }
 
-    //insert(heap_array, port);
-    //printArray(heap_array, size);
 }
+
+// Get boolean value of port
 bool get_port(port_t p)
 {
-    //if(p->misc == UNDEFINED) assert(false);
     return ((pdata_t)(p->misc))->value;
 }
 
+// Return current simulation time
 unsigned get_sim_time(void) {
     return t;
 }
 
+// Initlize global variables
 void sim_init(void) {
-    t=0;
-    gates_delayed_processing = 0;
+    t = 0;
+    gates_delayed_processing = NULL;
 }
 
+// Helper function
 int min(int one, int two) {
     return one < two ? one : two;
 }
 
-void sim_run(const unsigned nsteps) {
-   //t = t + nsteps;
-   int initial_t = t;
-   if (gates_delayed_processing!=0) {//if gates left to process process then run again
-   
-       process_delayed_gates();
-   }
 
-//    if (!seeFirst())
-//         {
-//             //printf("heap array is empty\n");
-//             t = initial_t + nsteps;
-//             return;
-//         }
-   unsigned int lastTime = seeFirst()->t;
-   while (size!=0 && seeFirst()->t <= initial_t+nsteps) {//while stuff to pop, pop it
-        //printf("in sim_run while for time of %08x\n", seeFirst()->t);
-       if (seeFirst()->t != lastTime) {//process delayed gates if there's a time difference
-           process_delayed_gates();
-           //process all delayed gates
-       }
-       //printf("processing port\n");
+// Run simulation for nsteps time intervals
+void sim_run(const unsigned nsteps) {
+   int initial_t = t;
+   // Process gates inital
+   if (gates_delayed_processing != NULL) process_delayed_gates();
+   
+
+   unsigned int last_time = seeFirst()->t;
+
+   // Process ports added to priority queue
+   while (size != 0 && seeFirst()->t <= initial_t + nsteps) {
+       // Process gates if there is time difference
+       if (seeFirst()->t != last_time) process_delayed_gates();
+       
        node_t node_pointer = seeFirst();
        deleteRoot(heap_array);
 
+        // Process clock special case
         if (node_pointer->port->pt == PTYPE_CLK) {
+           pdata_t pdata = ((pdata_t)(node_pointer->port->misc));
            int time_delay;
-           if (((pdata_t)(node_pointer->port->misc))->value == 1)//bc its about to change reverse
-                time_delay = ((clock_data_t)((pdata_t)node_pointer->port->misc)->clock_data)->time_low;
+           // Change clock interval 
+           if (pdata->value == TRUE)
+                time_delay = ((clock_data_t) pdata->clock_data)->time_low;
             else
-                time_delay = ((clock_data_t)((pdata_t)node_pointer->port->misc)->clock_data)->time_high;
-           //printf("%i, ", time_delay);
-           //added time_delay++;
-           time_delay++;
-           time_delay+= t;//add current time for when making the node
+                time_delay = ((clock_data_t) pdata->clock_data)->time_high;
 
+           time_delay++;
+           time_delay += t;
+
+           // Add clock port to priority queue for processing
            node_t node = malloc(sizeof(struct pq_node));
            node->port = node_pointer->port;
            node->new_value = (((pdata_t)(node_pointer->port->misc))->value);
-           //printf("%i\n", node->new_value);
            node->t = time_delay;
            insert(heap_array, node);
        }
@@ -488,8 +448,9 @@ void sim_run(const unsigned nsteps) {
         
     
    }
-   if (gates_delayed_processing!=0) {//if gates left to process process then run again
-       //printf("processing gates\n");
+
+   // Process any additional gates
+   if (gates_delayed_processing != NULL) {
        process_delayed_gates();
        sim_run(0);
    }
@@ -500,5 +461,5 @@ void sim_run(const unsigned nsteps) {
 
 
 void sim_exit(void) {
-
+    // TODO
 }
