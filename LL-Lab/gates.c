@@ -322,12 +322,8 @@ void wire(const port_t src, const port_t dst)
 
 // The remaining routines allow a test routine to simulate a given circuit for a number of timesteps.
 // A timestep is of an arbitrary and unspecified number of seconds.
-port_t clock(const unsigned hi, const unsigned lo)
-{
-    return subclock(hi, lo, t);
-}
 
-port_t subclock(const unsigned hi, const unsigned lo, int time)
+port_t clock(const unsigned hi, const unsigned lo)
 {
 
     port_t toRet = malloc(sizeof(struct port));

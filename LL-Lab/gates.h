@@ -87,7 +87,6 @@ void process_gate(gate_t g);
 // The remaining routines allow a test routine to simulate a given circuit for a number of timesteps.
 // A timestep is of an arbitrary and unspecified number of seconds.
 extern port_t clock(const unsigned hi, const unsigned lo);
-extern port_t subclock(const unsigned hi, const unsigned lo, int time);
 
 extern void set_port(port_t p, bool val);
 extern bool get_port(port_t p);
