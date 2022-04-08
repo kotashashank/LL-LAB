@@ -20,7 +20,7 @@ typedef struct pq_linked_list {
 } * ll;
 
 extern struct pq_linked_list * pq_global_ll;
-extern node_t heap_array[10];
+extern node_t heap_array[20];
 
 extern void insert(node_t array[], node_t new_port); 
 

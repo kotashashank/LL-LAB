@@ -21,7 +21,7 @@ int main(void) {
     
     
    unsigned t = get_sim_time();
-   for (int n = 0; n < 19; n++) {
+   for (int n = 0; n < 30; n++) {
       printf("[%du] %d %d %d\n", t, get_port(A), get_port(B), get_port(C));
       sim_run(1); t++;
       assert(get_sim_time() == t);

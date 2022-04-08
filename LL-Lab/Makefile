@@ -1,7 +1,7 @@
 # Definitions
 
 CC = gcc
-CC_FLAGS = -g -Wall
+C_FLAGS = -g -Wall
 
 GUI = -g
 

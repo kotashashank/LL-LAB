@@ -324,6 +324,11 @@ void wire(const port_t src, const port_t dst)
 // A timestep is of an arbitrary and unspecified number of seconds.
 port_t clock(const unsigned hi, const unsigned lo)
 {
+    return subclock(hi, lo, t);
+}
+
+port_t subclock(const unsigned hi, const unsigned lo, int time)
+{
 
     port_t toRet = malloc(sizeof(struct port));
     toRet->name = "clock";
@@ -449,14 +454,17 @@ void sim_run(const unsigned nsteps) {
                 time_delay = ((clock_data_t)((pdata_t)node_pointer->port->misc)->clock_data)->time_low;
             else
                 time_delay = ((clock_data_t)((pdata_t)node_pointer->port->misc)->clock_data)->time_high;
+           //printf("%i, ", time_delay);
+           //added time_delay++;
+           time_delay++;
            time_delay+= t;//add current time for when making the node
 
            node_t node = malloc(sizeof(struct pq_node));
            node->port = node_pointer->port;
-           node->new_value = !(((pdata_t)(node_pointer->port->misc))->value);
+           node->new_value = (((pdata_t)(node_pointer->port->misc))->value);
+           //printf("%i\n", node->new_value);
            node->t = time_delay;
            insert(heap_array, node);
-
        }
        set_port(node_pointer->port, node_pointer->new_value);
 
