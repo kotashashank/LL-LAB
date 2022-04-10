@@ -1,0 +1,10 @@
+You must install Tnkter for Python 3 to run the frontend.
+
+To run the frontend, type python3 driver.py.
+
+driver.py has a makefile variable toward the top that you change depending on the file:
+    - "runner" for fulladder.c
+    - "runner2" for fulladder2.c
+    - "clock" for testclock.c
+
+To run the regular output, just type the makefile. For example, input "runner" in the terminal to run fulladder's main method.

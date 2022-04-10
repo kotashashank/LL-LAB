@@ -345,8 +345,11 @@ void set_port(port_t p, bool val)
         if(p->pt == PTYPE_EXT_IN) printf("port \n");
     #endif
 
+
+    
     if (pdata->value == val && pdata->is_valid == TRUE) return;
         
+
             
 
     // Make port valid because it is being set
@@ -373,6 +376,7 @@ void set_port(port_t p, bool val)
 
         connected_gates = connected_gates->next;
     }
+
 
 }
 
@@ -409,9 +413,11 @@ void sim_run(const unsigned nsteps) {
    unsigned int last_time = seeFirst()->t;
 
    // Process ports added to priority queue
-   while (size != 0 && seeFirst()->t <= initial_t + nsteps) {
+   while (size != 0 && seeFirst()->t <= initial_t + nsteps+.00005) {
        // Process gates if there is time difference
-       if (seeFirst()->t != last_time) process_delayed_gates();
+       if (seeFirst()->t != last_time) {
+           process_delayed_gates();
+       }
        
        node_t node_pointer = seeFirst();
        deleteRoot(heap_array);
@@ -461,5 +467,5 @@ void sim_run(const unsigned nsteps) {
 
 
 void sim_exit(void) {
-    // TODO
+    free(gates_delayed_processing);
 }

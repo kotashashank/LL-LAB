@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "gates.h": "c",
-        "priorityqueue.h": "c"
+        "priorityqueue.h": "c",
+        "typeinfo": "c",
+        "ios": "c"
     }
 }

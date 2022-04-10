@@ -69,6 +69,7 @@ int main(void) {
                     sim_run(1); t++;
                     assert(get_sim_time() == t);
                 }
+                printf("\n");
             }
         }
     }
