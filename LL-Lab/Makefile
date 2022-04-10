@@ -23,4 +23,4 @@ clock: gates.o priorityqueue.o testclock.c
 	$(CC) $(GUI) -o clock testclock.c  gates.o priorityqueue.o 
 
 clean:
-	rm -f *.o runner runner2  clock
+	rm -f *.o runner runner2 clock fulladder base_out

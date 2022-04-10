@@ -7,4 +7,5 @@ driver.py has a makefile variable toward the top that you change depending on th
     - "runner2" for fulladder2.c
     - "clock" for testclock.c
 
-To run the regular output, just type the makefile. For example, input "runner" in the terminal to run fulladder's main method.
+To run the regular output, just run the makefile. 
+For example, input "make clean runner" then "runner" or "./runner" in the terminal to run fulladder's main method.
