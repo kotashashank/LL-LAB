@@ -1,4 +1,5 @@
 You must install Tnkter for Python 3 to run the frontend.
+You will also need graphviz so that you can draw the circuit.
 
 To run the frontend, type python3 driver.py.
 
