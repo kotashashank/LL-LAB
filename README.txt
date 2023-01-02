@@ -1,4 +1,4 @@
-# Logic Lab
+Logic Lab
 
 In this lab, we create a C backend to greedily analyze logical circuits as defined by users in code. The circuits start in an unknown state and then all ports are updated to reflect the signal propogating through the user's circuit. To aid in user debugging of their own code as well as understanding of the circuit, we employ graphviz to draw out the circuit the user defines; additionally, using tinkter we are able to create a graph visualization of ports users are interested in, allowing them to both visualize the circuit and the values of ports of interest through time.
 
